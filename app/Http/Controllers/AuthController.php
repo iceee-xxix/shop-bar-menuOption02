@@ -22,10 +22,10 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->with('categories')->first();
 
         if ($user && Hash::check($request->password, $user->password)) {
-            Session::put('user', $user); // เก็บ user ไว้ใน session
+            Session::put('user', $user); // เก็บ user ไว้ใน session\
 
             if ($user->role === 'admin') {
                 return redirect('/admin');

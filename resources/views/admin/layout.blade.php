@@ -24,9 +24,14 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
     <script>
+        <?php
+
+        use Illuminate\Support\Facades\Session;
+        ?>
         const PUSHER_APP_KEY = "{{ env('PUSHER_APP_KEY') }}";
         const PUSHER_APP_CLUSTER = "{{ env('PUSHER_APP_CLUSTER') }}";
-        
+        var categories_member_id = "{{Session::get('user')['categories']->categories_id}}";
+
         Pusher.logToConsole = true;
         var pusher = new Pusher(PUSHER_APP_KEY, {
             cluster: PUSHER_APP_CLUSTER,
@@ -34,12 +39,23 @@
         });
         var channel = pusher.subscribe('orders');
         channel.bind('App\\Events\\OrderCreated', function(data) {
-            console.log(data.order[0]);
-            document.getElementById('notifySound').play();
-            Swal.fire({
-                icon: 'info',
-                title: data.order[0],
-            })
+            const order = data.order;
+            <?php if (Session::get('user')->is_member == 0) { ?>
+                document.getElementById('notifySound').play();
+                Swal.fire({
+                    icon: 'info',
+                    title: order.text,
+                })
+            <?php }
+            if (Session::get('user')->is_member == 1) { ?>
+                if (order.categories_id == categories_member_id) {
+                    document.getElementById('notifySound').play();
+                    Swal.fire({
+                        icon: 'info',
+                        title: order.text,
+                    })
+                }
+            <?php } ?>
         });
     </script>
     <style>

@@ -49,6 +49,8 @@ class Main extends Controller
         $orderData = $request->input('orderData');
         $remark = $request->input('remark');
         $item = array();
+        $menu_id = array();
+        $categories_id = array();
         $total = 0;
         foreach ($orderData as $order) {
             foreach ($order as $rs) {
@@ -59,8 +61,15 @@ class Main extends Controller
                     'qty' => $rs['qty'],
                 ];
                 $total = $total + ($rs['price'] * $rs['qty']);
+                $menu_id[] = $rs['id'];
             }
         }
+        $menu_id = array_unique($menu_id);
+        foreach ($menu_id as $rs) {
+            $menu = Menu::find($rs);
+            $categories_id[] = $menu->categories_member_id;
+        }
+        $categories_id = array_unique($categories_id);
 
         if (!empty($item)) {
             $order = new Orders();
@@ -95,7 +104,21 @@ class Main extends Controller
                     }
                 }
             }
-            event(new OrderCreated(['📦 มีออเดอร์ใหม่']));
+            $order = [
+                'is_member' => 0,
+                'text' => '📦 มีออเดอร์ใหม่'
+            ];
+            event(new OrderCreated($order));
+            if (!empty($categories_id)) {
+                foreach ($categories_id as $rs) {
+                    $order = [
+                        'is_member' => 1,
+                        'categories_id' => $rs,
+                        'text' => '📦 มีออเดอร์ใหม่'
+                    ];
+                    event(new OrderCreated($order));
+                }
+            }
             $data = [
                 'status' => true,
                 'message' => 'สั่งออเดอร์เรียบร้อยแล้ว',
