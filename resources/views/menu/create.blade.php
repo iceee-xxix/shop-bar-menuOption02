@@ -45,6 +45,17 @@
                                             <input class="form-control" type="file" id="file" name="file">
                                         </div>
                                     </div>
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-12">
+                                            <label for="name" class="form-label">ผู้รับผิดชอบ : </label>
+                                            <select class="form-control" name="categories_member_id" id="categories_member_id" required>
+                                                <option value="" disabled selected>เลือก</option>
+                                                @foreach($category_member as $categories)
+                                                <option value="{{$categories->id}}">{{$categories->name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="card-footer d-flex justify-content-end">
                                     <button type="submit" class="btn btn-outline-primary">บันทึก</button>

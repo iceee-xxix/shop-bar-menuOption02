@@ -26,7 +26,7 @@ $config = Config::first();
                 <div data-i18n="Analytics">Dashboard</div>
             </a>
         </li>
-        @if(Session::get('user')->is_rider == 0)
+        @if(Session::get('user')->is_rider == 0 && Session::get('user')->is_member == 0)
         <li class="menu-item {{ ($function_key == 'order') ? 'active' : '' }}">
             <a href="{{route('adminorder')}}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-store"></i>
@@ -56,6 +56,19 @@ $config = Config::first();
             <a href="{{route('table')}}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-barcode"></i>
                 <div data-i18n="Analytics">จัดการโต้ะ</div>
+            </a>
+        </li>
+        <li class="menu-header small text-uppercase"><span class="menu-header-text">สมาชิก</span></li>
+        <li class="menu-item {{ ($function_key == 'memberCategory') ? 'active' : '' }}">
+            <a href="{{route('memberCategory')}}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-collection"></i>
+                <div data-i18n="Analytics">หมวดหมู่สมาชิก</div>
+            </a>
+        </li>
+        <li class="menu-item {{ ($function_key == 'member') ? 'active' : '' }}">
+            <a href="{{route('member')}}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-user-pin"></i>
+                <div data-i18n="Analytics">สมาชิก</div>
             </a>
         </li>
         <li class="menu-item {{ ($function_key == 'rider') ? 'active' : '' }}">
@@ -102,6 +115,13 @@ $config = Config::first();
             <a href="{{route('OrderRider')}}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-cycling"></i>
                 <div data-i18n="Analytics">ไรเดอร์</div>
+            </a>
+        </li>
+        @elseif(Session::get('user')->is_member == 1)
+        <li class="menu-item {{ ($function_key == 'Memberorder') ? 'active' : '' }}">
+            <a href="{{route('Memberorder')}}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-store"></i>
+                <div data-i18n="Analytics">ออเดอร์ของคุณ</div>
             </a>
         </li>
         @endif

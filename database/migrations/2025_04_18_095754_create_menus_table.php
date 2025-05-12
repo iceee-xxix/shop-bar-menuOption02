@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('menus', function (Blueprint $table) {
             $table->id();
             $table->integer('categories_id');
+            $table->integer('categories_member_id');
             $table->text('name')->nullable();
             $table->text('detail')->nullable();
             $table->timestamps();

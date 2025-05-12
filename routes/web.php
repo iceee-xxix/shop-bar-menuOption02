@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Controllers\admin\Admin;
+use App\Http\Controllers\admin\CategoriesMember;
 use App\Http\Controllers\admin\Category;
 use App\Http\Controllers\admin\CategoryExpenses;
 use App\Http\Controllers\admin\Expenses;
+use App\Http\Controllers\admin\Member;
+use App\Http\Controllers\admin\Memberorder;
 use App\Http\Controllers\admin\Menu;
 use App\Http\Controllers\admin\Promotion;
 use App\Http\Controllers\admin\Table;
@@ -129,7 +132,6 @@ Route::middleware(['role:admin'])->group(function () {
     //จัดการโต้ะและเพิ่ม Qr code
     Route::get('/admin/OrderRider', [Rider::class, 'OrderRider'])->name('OrderRider');
     Route::post('/admin/OrderRider/listData', [Rider::class, 'OrderRiderlistData'])->name('OrderRiderlistData');
-
     //เมนูอาหาร
     Route::get('/admin/menu', [Menu::class, 'menu'])->name('menu');
     Route::post('/admin/menu/menulistData', [Menu::class, 'menulistData'])->name('menulistData');
@@ -173,6 +175,24 @@ Route::middleware(['role:admin'])->group(function () {
     Route::get('/admin/expenses/edit/{id}', [Expenses::class, 'ExpensesEdit'])->name('ExpensesEdit');
     Route::post('/admin/expenses/save', [Expenses::class, 'ExpensesSave'])->name('ExpensesSave');
     Route::post('/admin/expenses/delete', [Expenses::class, 'ExpensesDelete'])->name('ExpensesDelete');
+    //สมาชิกหมวดหมู่
+    Route::get('/admin/member/category', [CategoriesMember::class, 'memberCategory'])->name('memberCategory');
+    Route::post('/admin/member/category/listData', [CategoriesMember::class, 'membercategorylistData'])->name('membercategorylistData');
+    Route::get('/admin/member/category/create', [CategoriesMember::class, 'memberCategoryCreate'])->name('memberCategoryCreate');
+    Route::get('/admin/member/category/edit/{id}', [CategoriesMember::class, 'memberCategoryEdit'])->name('memberCategoryEdit');
+    Route::post('/admin/member/category/delete', [CategoriesMember::class, 'memberCategoryDelete'])->name('memberCategoryDelete');
+    Route::post('/admin/member/category/save', [CategoriesMember::class, 'memberCategorySave'])->name('memberCategorySave');
+    //ข้อมูลสมาชิก
+    Route::get('/admin/member', [member::class, 'member'])->name('member');
+    Route::post('/admin/member/listData', [Member::class, 'memberlistData'])->name('memberlistData');
+    Route::get('/admin/member/create', [Member::class, 'memberCreate'])->name('memberCreate');
+    Route::get('/admin/member/edit/{id}', [Member::class, 'memberEdit'])->name('memberEdit');
+    Route::post('/admin/member/delete', [Member::class, 'memberDelete'])->name('memberDelete');
+    Route::post('/admin/member/save', [Member::class, 'memberSave'])->name('memberSave');
+    //ผู้ดูแลเมนู
+    Route::get('/admin/memberorder', [Memberorder::class, 'Memberorder'])->name('Memberorder');
+    Route::post('/admin/memberorder/listData', [Memberorder::class, 'MemberorderlistData'])->name('MemberorderlistData');
+    Route::post('/admin/memberorder/MemberorderlistOrderDetail', [Memberorder::class, 'MemberorderlistOrderDetail'])->name('MemberorderlistOrderDetail');
 });
 
 
