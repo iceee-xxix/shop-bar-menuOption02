@@ -30,7 +30,7 @@
         ?>
         const PUSHER_APP_KEY = "{{ env('PUSHER_APP_KEY') }}";
         const PUSHER_APP_CLUSTER = "{{ env('PUSHER_APP_CLUSTER') }}";
-        var categories_member_id = "{{ (Session::get('user')->is_member) ? ['categories']->categories_id : ''}}";
+        var categories_member_id = "{{ (Session::get('user')->is_member) ? Session::get('user')['categories']->categories_id : ''}}";
 
         Pusher.logToConsole = true;
         var pusher = new Pusher(PUSHER_APP_KEY, {
