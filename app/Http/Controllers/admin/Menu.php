@@ -109,9 +109,10 @@ class Menu extends Controller
     {
         $function_key = 'menu';
         $info = ModelsMenu::with('files', 'category')->find($id);
+        $category_member = Categories_member::get();
         $category = Categories::get();
 
-        return view('menu.edit', compact('info', 'function_key', 'category'));
+        return view('menu.edit', compact('info', 'function_key', 'category', 'category_member'));
     }
 
     public function menuDelete(Request $request)
