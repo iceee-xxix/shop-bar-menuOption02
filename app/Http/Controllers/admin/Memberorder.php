@@ -83,31 +83,38 @@ class Memberorder extends Controller
 
     public function MemberorderlistOrderDetail(Request $request)
     {
-        $id = UsersCategories::where('users_id', Session::get('user')->id)->first()->categories_id;
+        $categoryId = UsersCategories::where('users_id', Session::get('user')->id)->value('categories_id');
         $orders = Orders::where('table_id', $request->input('id'))
             ->where('status', 1)
             ->get();
         $info = '';
-        foreach ($orders as $rs) {
-            $orderdetails = OrdersDetails::select('menu_id')
-                ->join('menus', 'orders_details.menu_id', '=', 'menus.id')
-                ->where('order_id', $rs->id)
-                ->where('menus.categories_member_id', $id)
-                ->groupBy('menu_id')
-                ->get();
-            $order_id = $rs->id;
-            if (count($orderdetails) > 0) {
-                foreach ($orderdetails as $key => $value) {
-                    $order = OrdersDetails::where('order_id', $order_id)
-                        ->where('menu_id', $value->menu_id)
-                        ->with('menu', 'option')
-                        ->get();
-                    $info .= '<div class="card text-white bg-primary mb-3"><div class="card-body"><h5 class="card-title text-white">' . $order[0]['menu']->name . '</h5><p class="card-text">';
-                    foreach ($order as $rs) {
-                        $info .= '' . $rs['menu']->name . ' (' . $rs['option']->type . ') จำนวน ' . $rs->quantity . ' ราคา ' . ($rs->quantity * $rs->price) . ' บาท <br>';
+        foreach ($orders as $order) {
+            $orderDetailsGrouped = OrdersDetails::join('menus', 'orders_details.menu_id', '=', 'menus.id')
+                ->where('orders_details.order_id', $order->id)
+                ->where('menus.categories_member_id', $categoryId)
+                ->select('orders_details.*')
+                ->with('menu', 'option')
+                ->get()
+                ->groupBy('menu_id');
+            if ($orderDetailsGrouped->isNotEmpty()) {
+                $info .= '<div class="mb-3">';
+                $info .= '<div class="row"><div class="col d-flex align-items-end"><h5 class="text-primary mb-2">เลขออเดอร์ #: ' . $order->id . '</h5></div></div>';
+                foreach ($orderDetailsGrouped as $details) {
+                    $menuName = optional($details->first()->menu)->name ?? 'ไม่พบชื่อเมนู';
+                    $info .= '<ul class="list-group mb-1 shadow-sm rounded">';
+                    foreach ($details as $detail) {
+                        $option = $detail->option;
+                        $optionType = $option ? $menuName . ' ' . $option->type : 'ไม่มีตัวเลือก';
+                        $priceTotal = number_format($detail->quantity * $detail->price, 2);
+
+                        $info .= '<li class="list-group-item d-flex bd-highlight align-items-center">';
+                        $info .= '<div class="flex-grow-1 bd-highlight"><small class="text-muted">' . htmlspecialchars($optionType) . '</small> — <span class="fw-medium">จำนวน ' . $detail->quantity . '</span></div>';
+                        $info .= '<button class="btn btn-sm btn-primary bd-highlight">' . $priceTotal . ' บาท</button>';
+                        $info .= '</li>';
                     }
-                    $info .= '</p></div></div>';
+                    $info .= '</ul>';
                 }
+                $info .= '</div>';
             }
         }
         echo $info;
