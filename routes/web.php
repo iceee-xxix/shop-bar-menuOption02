@@ -152,6 +152,7 @@ Route::middleware(['role:admin'])->group(function () {
     Route::post('/admin/menu/menuOptionSave', [Menu::class, 'menuOptionSave'])->name('menuOptionSave');
     Route::post('/admin/menu/menuOptionUpdate', [Menu::class, 'menuOptionUpdate'])->name('menuOptionUpdate');
     Route::get('/admin/menu/menuOptionEdit/{id}', [Menu::class, 'menuOptionEdit'])->name('menuOptionEdit');
+    Route::post('/admin/menu/menuOptionEdit/delete', [Menu::class, 'menuOptionDelete'])->name('menuOptionDelete');
     //สต็อกสินค้า
     Route::get('/admin/stock', [Stock::class, 'stock'])->name('stock');
     Route::post('/admin/stock/stocklistData', [Stock::class, 'stocklistData'])->name('stocklistData');
