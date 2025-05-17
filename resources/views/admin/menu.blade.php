@@ -121,7 +121,13 @@ $config = Config::first();
         <li class="menu-item {{ ($function_key == 'Memberorder') ? 'active' : '' }}">
             <a href="{{route('Memberorder')}}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-store"></i>
-                <div data-i18n="Analytics">ออเดอร์ของคุณ</div>
+                <div data-i18n="Analytics">ออเดอร์หน้าร้าน</div>
+            </a>
+        </li>
+        <li class="menu-item {{ ($function_key == 'MemberorderRider') ? 'active' : '' }}">
+            <a href="{{route('MemberorderRider')}}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-cycling"></i>
+                <div data-i18n="Analytics">ออเดอร์ออนไลน์</div>
             </a>
         </li>
         @endif

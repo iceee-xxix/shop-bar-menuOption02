@@ -509,7 +509,7 @@ class Admin extends Controller
             $info .= '<div class="row">';
             $info .= '<div class="col d-flex align-items-end"><h5 class="text-primary mb-2">เลขออเดอร์ #: ' . $orderId . '</h5></div>';
             $info .= '<div class="col-auto d-flex align-items-start">';
-            $info .= '<a href="javascript:void(0)" class="badge rounded-pill bg-danger cancelOrderSwal" data-id="' . $orderId . '">ยกเลิกออเดอร์</a>';
+            $info .= '<button href="javascript:void(0)" class="btn btn-sm btn-danger cancelOrderSwal m-1" data-id="' . $orderId . '">ยกเลิกออเดอร์</button>';
             $info .= '</div></div>';
             foreach ($orders as $value) {
                 $order = OrdersDetails::where('order_id', $orderId)
@@ -522,11 +522,11 @@ class Admin extends Controller
                     $priceTotal = number_format($rs->quantity * $rs->price, 2);
                     $info .= '<li class="list-group-item d-flex bd-highlight align-items-center">';
                     $info .= '<div class="flex-grow-1 bd-highlight">';
-                    $info .= '<small class="text-muted">' . $optionType . '</small> — ';
+                    $info .= '<small class="text-muted">' . $rs['menu']->name . ' ' . $optionType . '</small> — ';
                     $info .= '<span class="fw-medium">จำนวน ' . $rs->quantity . '</span>';
                     $info .= '</div>';
-                    $info .= '<span class="badge bg-primary rounded-pill bd-highlight">' . $priceTotal . ' บาท</span>';
-                    $info .= '<a href="javascript:void(0)" class="badge rounded-pill bg-danger bd-highlight m-1 cancelMenuSwal" data-id="' . $rs->id . '">ยกเลิก</a>';
+                    $info .= '<button class="btn btn-sm btn-primary bd-highlight">' . $priceTotal . ' บาท</button>';
+                    $info .= '<button href="javascript:void(0)" class="btn btn-sm btn-danger bd-highlight m-1 cancelMenuSwal" data-id="' . $rs->id . '">ยกเลิก</button>';
                     $info .= '</li>';
                 }
                 $info .= '</ul>';

@@ -44,7 +44,7 @@
                 document.getElementById('notifySound').play();
                 Swal.fire({
                     icon: 'info',
-                    title: order.text,
+                    title: order,
                 })
             <?php }
             if (Session::get('user')->is_member == 1) { ?>

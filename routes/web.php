@@ -196,9 +196,12 @@ Route::middleware(['role:admin'])->group(function () {
     Route::get('/admin/member/edit/{id}', [Member::class, 'memberEdit'])->name('memberEdit');
     Route::post('/admin/member/delete', [Member::class, 'memberDelete'])->name('memberDelete');
     Route::post('/admin/member/save', [Member::class, 'memberSave'])->name('memberSave');
-    //ผู้ดูแลเมนู
+    //ผู้ดูแลเมนูหน้าร้าน
     Route::get('/admin/memberorder', [Memberorder::class, 'Memberorder'])->name('Memberorder');
     Route::post('/admin/memberorder/listData', [Memberorder::class, 'MemberorderlistData'])->name('MemberorderlistData');
+    Route::post('/admin/memberorder/MemberorderRiderlistData', [Memberorder::class, 'MemberorderRiderlistData'])->name('MemberorderRiderlistData');
+    //ผู้ดูแลเมนูออนไลน์
+    Route::get('/admin/memberorderRider', [Memberorder::class, 'MemberorderRider'])->name('MemberorderRider');
     Route::post('/admin/memberorder/MemberorderlistOrderDetail', [Memberorder::class, 'MemberorderlistOrderDetail'])->name('MemberorderlistOrderDetail');
 });
 
