@@ -63,7 +63,7 @@
 
         .info p {
             margin: 4px 0;
-            font-size: 22px;
+            font-size: 26px;
         }
 
         table {
@@ -75,7 +75,7 @@
         th,
         td {
             padding: 10px;
-            font-size: 22px;
+            font-size: 26px;
         }
 
         th:nth-child(1),
