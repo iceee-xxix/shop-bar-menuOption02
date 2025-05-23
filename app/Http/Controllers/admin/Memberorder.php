@@ -59,6 +59,7 @@ class Memberorder extends Controller
                         ->where('menus.categories_member_id', $categoryId)
                         ->select('orders_details.*')
                         ->with('menu', 'option')
+                        ->where('orders_details.status', 1)
                         ->get()
                         ->groupBy('menu_id');
                     if ($orderDetailsGrouped->isNotEmpty()) {
@@ -115,6 +116,7 @@ class Memberorder extends Controller
                 ->where('menus.categories_member_id', $categoryId)
                 ->select('orders_details.*')
                 ->with('menu', 'option')
+                ->where('orders_details.status', 1)
                 ->get()
                 ->groupBy('menu_id');
             if ($orderDetailsGrouped->isNotEmpty()) {
@@ -131,6 +133,9 @@ class Memberorder extends Controller
                         $info .= '<li class="list-group-item d-flex bd-highlight align-items-center">';
                         $info .= '<div class="flex-grow-1 bd-highlight"><small class="text-muted">' . htmlspecialchars($optionType) . '</small> — <span class="fw-medium">จำนวน ' . $detail->quantity . '</span></div>';
                         $info .= '<button class="btn btn-sm btn-primary bd-highlight">' . $priceTotal . ' บาท</button>';
+                        if ($detail->status == 1) {
+                            $info .= '<button href="javascript:void(0)" class="btn btn-sm btn-info bd-highlight m-1 updatestatusMenu" data-id="' . $detail->id . '">อัพเดทสถานะ</button>';
+                        }
                         $info .= '</li>';
                     }
                     $info .= '</ul>';

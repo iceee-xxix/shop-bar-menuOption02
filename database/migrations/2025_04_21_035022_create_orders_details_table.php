@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('option_id');
             $table->integer('quantity');
             $table->integer('price');
+            $table->integer('status')->default(1);
             $table->timestamps();
         });
     }

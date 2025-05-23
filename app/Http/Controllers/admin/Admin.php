@@ -89,7 +89,7 @@ class Admin extends Controller
                 }
 
                 if ($rs->status != 3) {
-                    $pay = '<a href="' . route('printOrderAdmin', $rs->table_id) . '" target="_blank" type="button" class="btn btn-sm btn-outline-primary">ปริ้นออเดอร์</a><button data-id="' . $rs->table_id . '" data-total="' . $rs->total . '" type="button" class="btn btn-sm btn-outline-success modalPay">ชำระเงิน</button>';
+                    $pay = '<a href="' . route('printOrderAdmin', $rs->table_id) . '" target="_blank" type="button" class="btn btn-sm btn-outline-primary m-1">ปริ้นออเดอร์</a><button data-id="' . $rs->table_id . '" data-total="' . $rs->total . '" type="button" class="btn btn-sm btn-outline-success modalPay">ชำระเงิน</button>';
                 }
                 $flag_order = '<button class="btn btn-sm btn-success">สั่งหน้าร้าน</button>';
                 $action = '<button data-id="' . $rs->table_id . '" type="button" class="btn btn-sm btn-outline-primary modalShow m-1">รายละเอียด</button>' . $pay;
@@ -615,6 +615,37 @@ class Admin extends Controller
             $order = Orders::find($id);
             $order->status = 2;
             if ($order->save()) {
+                $check = OrdersDetails::where('order_id', $id)->where('status', 1)->get();
+                foreach ($check as $rs) {
+                    $rs->status = 2;
+                    $rs->save();
+                }
+                $data = [
+                    'status' => true,
+                    'message' => 'อัพเดทสถานะเรียบร้อยแล้ว',
+                ];
+            }
+        }
+        return response()->json($data);
+    }
+
+    public function updatestatusMenu(Request $request)
+    {
+        $data = [
+            'status' => false,
+            'message' => 'อัพเดทสถานะไม่สำเร็จ',
+        ];
+        $id = $request->input('id');
+        if ($id) {
+            $order = OrdersDetails::find($id);
+            $order->status = 2;
+            if ($order->save()) {
+                $check = OrdersDetails::where('order_id', $order->order_id)->where('status', 1)->count();
+                if ($check == 0) {
+                    $updateOrder = Orders::find($order->order_id);
+                    $updateOrder->status = 2;
+                    $updateOrder->save();
+                }
                 $data = [
                     'status' => true,
                     'message' => 'อัพเดทสถานะเรียบร้อยแล้ว',

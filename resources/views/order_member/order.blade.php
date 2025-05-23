@@ -126,5 +126,39 @@
             }
         });
     });
+    $(document).on('click', '.updatestatusMenu', function(e) {
+        var id = $(this).data('id');
+        $('#modal-detail').modal('hide');
+        Swal.fire({
+            title: "<h5>ท่านต้องการอัพเดทสถานะรายการนี้ใช่หรือไม่</h5>",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "ยืนยัน",
+            denyButtonText: 'ยกเลิก'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.showLoading();
+                $.ajax({
+                    type: "post",
+                    url: "{{ route('updatestatusMenu') }}",
+                    data: {
+                        id: id
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        Swal.close();
+                        if (response.status == true) {
+                            $('#myTable').DataTable().ajax.reload(null, false);
+                            Swal.fire(response.message, "", "success");
+                        } else {
+                            Swal.fire(response.message, "", "error");
+                        }
+                    }
+                });
+            }
+        });
+    });
 </script>
 @endsection

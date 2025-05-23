@@ -101,6 +101,7 @@ Route::middleware(['role:admin'])->group(function () {
     //update-status
     Route::post('/admin/order/updatestatus', [Admin::class, 'updatestatus'])->name('updatestatus');
     Route::post('/admin/order/updatestatusOrder', [Admin::class, 'updatestatusOrder'])->name('updatestatusOrder');
+    Route::post('/admin/order/updatestatusMenu', [Admin::class, 'updatestatusMenu'])->name('updatestatusMenu');
     //ตั้งค่าเว็บไซต์
     Route::get('/admin/config', [Admin::class, 'config'])->name('config');
     Route::post('/admin/config/save', [Admin::class, 'ConfigSave'])->name('ConfigSave');
