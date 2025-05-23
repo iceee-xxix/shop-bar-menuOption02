@@ -138,7 +138,7 @@ class Admin extends Controller
                     $info .= '<li class="list-group-item d-flex bd-highlight align-items-center">';
                     $info .= '<div class="flex-grow-1 bd-highlight"><small class="text-muted">' . htmlspecialchars($optionType) . '</small> — <span class="fw-medium">จำนวน ' . $detail->quantity . '</span></div>';
                     if ($detail->status == 1) {
-                        $info .= '<button class="btn btn-sm btn-success">กำลังทำอาหาร</button>';
+                        $info .= '<button class="btn btn-sm btn-primary">กำลังทำอาหาร</button>';
                     }
                     if ($detail->status == 2) {
                         $info .= '<button class="btn btn-sm btn-success">ทำอาหารเสร็จ</button>';
