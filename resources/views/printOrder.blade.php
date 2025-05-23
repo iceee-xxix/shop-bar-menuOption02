@@ -125,7 +125,7 @@
             </center>
             <div class="header">
                 <div class="info">
-                    <p><strong>เลขที่ใบเสร็จ #</strong></p>
+                    <p><strong>เลขที่โต้ะ #{{$table->table_number}}</strong></p>
                     <p>วันที่: <?= date('Y-m-d H:i:s') ?></p>
                 </div>
             </div>
@@ -156,5 +156,5 @@
 
 </html>
 <script>
-    window.print();
+    // window.print();
 </script>

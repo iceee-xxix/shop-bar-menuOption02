@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Config;
 use App\Models\Orders;
 use App\Models\OrdersDetails;
+use App\Models\Table;
 use App\Models\User;
 use App\Models\UsersCategories;
 use Illuminate\Http\Request;
@@ -236,7 +237,36 @@ class Memberorder extends Controller
         $order = OrdersDetails::whereIn('order_id', $order_id)
             ->with('menu', 'option')
             ->get();
-        return view('printOrder', compact('config', 'order', 'qr'));
+        $table = Table::find($id);
+        return view('printOrder', compact('config', 'order', 'qr', 'table'));
+    }
+
+    public function printOrderAdminCook($id)
+    {
+        $config = Config::first();
+        $getOrder = Orders::where('table_id', $id)->where('status', 1)->get();
+        $order_id = array();
+        $qr = '';
+        if ($config->promptpay != '') {
+            $qr = Builder::staticMerchantPresentedQR($config->promptpay)->toSvgString();
+            $qr = str_replace('<svg', '<svg width="150" height="150"', $qr);
+            $qr = '<div style="width: 150px; height: 150px; overflow: hidden;">
+                        <div style="transform: scale(1.25); transform-origin: center;">
+                            ' . $qr . '
+                        </div>
+                    </div>';
+        } elseif ($config->image_qr != '') {
+            $qr = '<img width="150px" src="' . url('storage/' . $config->image_qr) . '">';
+        }
+        foreach ($getOrder as $rs) {
+            $order_id[] = $rs->id;
+        }
+        $categoryId = UsersCategories::where('users_id', Session::get('user')->id)->value('categories_id');
+        $order = OrdersDetails::whereIn('order_id', $order_id)
+            ->with('menu', 'option')
+            ->get();
+        $table = Table::find($id);
+        return view('printOrder', compact('config', 'order', 'qr', 'table'));
     }
 
     public function printOrder($id)

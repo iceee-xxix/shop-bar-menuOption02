@@ -206,6 +206,7 @@ Route::middleware(['role:admin'])->group(function () {
     Route::post('/admin/memberorder/MemberorderlistOrderDetail', [Memberorder::class, 'MemberorderlistOrderDetail'])->name('MemberorderlistOrderDetail');
     //ปริ้นออเดอร์
     Route::get('/admin/order/printOrderAdmin/{id}', [Memberorder::class, 'printOrderAdmin'])->name('printOrderAdmin');
+    Route::get('/admin/order/printOrderAdminCook/{id}', [Memberorder::class, 'printOrderAdminCook'])->name('printOrderAdminCook');
     Route::get('/admin/order/printOrder/{id}', [Memberorder::class, 'printOrder'])->name('printOrder');
     Route::get('/admin/order/printOrderRider/{id}', [Memberorder::class, 'printOrderRider'])->name('printOrderRider');
 });
