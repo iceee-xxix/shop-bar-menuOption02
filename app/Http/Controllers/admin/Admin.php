@@ -80,13 +80,11 @@ class Admin extends Controller
         if (count($order) > 0) {
             $info = [];
             foreach ($order as $rs) {
-                dd($rs);
                 $status = '';
                 $pay = '';
-                if ($rs->has_status_1 == 1) {
+                if ($rs->has_status_1 > 0) {
                     $status = '<button type="button" class="btn btn-sm btn-primary update-status" data-id="' . $rs->table_id . '">กำลังทำอาหาร</button>';
-                }
-                if ($rs->has_status_1 == 0) {
+                } else {
                     $status = '<button class="btn btn-sm btn-success">ออเดอร์สำเร็จแล้ว</button>';
                 }
 
