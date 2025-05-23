@@ -80,7 +80,7 @@ class Admin extends Controller
         if (count($order) > 0) {
             $info = [];
             foreach ($order as $rs) {
-                dd($rsrder);
+                dd($rs);
                 $status = '';
                 $pay = '';
                 if ($rs->has_status_1 == 1) {
