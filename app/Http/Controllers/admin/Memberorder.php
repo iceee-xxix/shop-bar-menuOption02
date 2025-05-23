@@ -212,6 +212,7 @@ class Memberorder extends Controller
         $config = Config::first();
         $getOrder = Orders::where('table_id', $id)->whereIn('status', [1, 2])->get();
         $order_id = array();
+        $qr = '';
         if ($config->promptpay != '') {
             $qr = Builder::staticMerchantPresentedQR($config->promptpay)->toSvgString();
             $qr = str_replace('<svg', '<svg width="150" height="150"', $qr);
@@ -238,6 +239,7 @@ class Memberorder extends Controller
         $config = Config::first();
         $getOrder = Orders::where('table_id', $id)->where('status', 1)->get();
         $order_id = array();
+        $qr = '';
         if ($config->promptpay != '') {
             $qr = Builder::staticMerchantPresentedQR($config->promptpay)->toSvgString();
             $qr = str_replace('<svg', '<svg width="150" height="150"', $qr);
@@ -265,6 +267,7 @@ class Memberorder extends Controller
     {
         $config = Config::first();
         $order_id = array();
+        $qr = '';
         if ($config->promptpay != '') {
             $qr = Builder::staticMerchantPresentedQR($config->promptpay)->toSvgString();
             $qr = str_replace('<svg', '<svg width="150" height="150"', $qr);
