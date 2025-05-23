@@ -137,6 +137,13 @@ class Admin extends Controller
                     $priceTotal = number_format($detail->quantity * $detail->price, 2);
                     $info .= '<li class="list-group-item d-flex bd-highlight align-items-center">';
                     $info .= '<div class="flex-grow-1 bd-highlight"><small class="text-muted">' . htmlspecialchars($optionType) . '</small> — <span class="fw-medium">จำนวน ' . $detail->quantity . '</span></div>';
+                    if ($detail->status == 1) {
+                        $info .= '<button class="btn btn-sm btn-success">กำลังทำอาหาร</button>';
+                    }
+                    if ($detail->status == 2) {
+                        $info .= '<button class="btn btn-sm btn-success">ทำอาหารเสร็จ</button>';
+                    }
+                    $info .= '<button class="btn btn-sm btn-primary bd-highlight">' . $priceTotal . ' บาท</button>';
                     $info .= '<button class="btn btn-sm btn-primary bd-highlight">' . $priceTotal . ' บาท</button>';
                     $info .= '<button href="javascript:void(0)" class="btn btn-sm btn-danger bd-highlight m-1 cancelMenuSwal" data-id="' . $detail->id . '">ยกเลิก</button>';
                     $info .= '</li>';
