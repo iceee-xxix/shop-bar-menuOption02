@@ -85,7 +85,7 @@ class Admin extends Controller
                 if ($rs->has_status_1 == 1) {
                     $status = '<button type="button" class="btn btn-sm btn-primary update-status" data-id="' . $rs->table_id . '">กำลังทำอาหาร</button>';
                 }
-                if ($rs->has_status_1 == 0) {
+                if ($rs->has_status_1 == 2) {
                     $status = '<button class="btn btn-sm btn-success">ออเดอร์สำเร็จแล้ว</button>';
                 }
 

@@ -53,7 +53,7 @@
                                     <div class="row g-3 mb-3">
                                         <div class="col-md-12">
                                             <label for="name" class="form-label">ผู้รับผิดชอบ : </label>
-                                            <select class="form-control" name="categories_member_id" id="categories_member_id" required>
+                                            <select class="form-control" name="categories_member_id" id="categories_member_id">
                                                 <option value="" disabled selected>เลือก</option>
                                                 @foreach($category_member as $categories)
                                                 <option value="{{$categories->id}}" {{($info->categories_member_id == $categories->id) ? 'selected' : ''}}>{{$categories->name}}</option>
