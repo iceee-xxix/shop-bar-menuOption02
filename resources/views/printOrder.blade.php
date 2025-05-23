@@ -21,7 +21,7 @@
             margin: 0 auto;
             /* จัดให้อยู่กึ่งกลางแนวนอน */
             background: #ffffff;
-            border: 1px solid black;
+            /* border: 1px solid black; */
             padding: 10px;
             border-radius: 5px;
         }
@@ -29,7 +29,7 @@
         .receipt h2 {
             text-align: center;
             margin-top: 5px;
-            font-size: 30px;
+            font-size: 38px;
             margin-bottom: 0px;
             font-weight: bold;
             color: black;
@@ -63,7 +63,7 @@
 
         .info p {
             margin: 4px 0;
-            font-size: 16px;
+            font-size: 22px;
         }
 
         table {
@@ -75,7 +75,7 @@
         th,
         td {
             padding: 10px;
-            font-size: 16px;
+            font-size: 22px;
         }
 
         th:nth-child(1),
