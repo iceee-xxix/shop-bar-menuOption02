@@ -11,6 +11,7 @@ use App\Models\UsersCategories;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use PromptPayQR\Builder;
 
 class Memberorder extends Controller
 {
@@ -46,20 +47,40 @@ class Memberorder extends Controller
 
         if (count($order) > 0) {
             $info = [];
+            $check = 0;
             foreach ($order as $rs) {
-                if ($rs->status == 1) {
-                    $status = '<button class="btn btn-sm btn-primary">ออเดอร์ใหม่</button>';
+                $categoryId = UsersCategories::where('users_id', Session::get('user')->id)->value('categories_id');
+                $orders = Orders::where('table_id', $rs->table_id)
+                    ->where('status', 1)
+                    ->get();
+                foreach ($orders as $rc) {
+                    $orderDetailsGrouped = OrdersDetails::join('menus', 'orders_details.menu_id', '=', 'menus.id')
+                        ->where('orders_details.order_id', $rc->id)
+                        ->where('menus.categories_member_id', $categoryId)
+                        ->select('orders_details.*')
+                        ->with('menu', 'option')
+                        ->get()
+                        ->groupBy('menu_id');
+                    if ($orderDetailsGrouped->isNotEmpty()) {
+                        $check = 1;
+                    }
                 }
-                $flag_order = '<button class="btn btn-sm btn-success">สั่งหน้าร้าน</button>';
-                $action = '<button data-id="' . $rs->table_id . '" type="button" class="btn btn-sm btn-outline-primary modalShow m-1">รายละเอียด</button>';
-                $info[] = [
-                    'flag_order' => $flag_order,
-                    'table_id' => $rs->table_id,
-                    'remark' => $rs->remark,
-                    'status' => $status,
-                    'created' => $this->DateThai($rs->created_at),
-                    'action' => $action
-                ];
+                if ($check == 1) {
+                    if ($rs->status == 1) {
+                        $status = '<button class="btn btn-sm btn-primary">ออเดอร์ใหม่</button>';
+                    }
+                    $flag_order = '<button class="btn btn-sm btn-success">สั่งหน้าร้าน</button>';
+                    $action = '<button data-id="' . $rs->table_id . '" type="button" class="btn btn-sm btn-outline-primary modalShow">รายละเอียด</button>
+                    <a href="' . route('printOrder', $rs->table_id) . '" target="_blank" type="button" class="btn btn-sm btn-outline-primary">ปริ้นออเดอร์</a>';
+                    $info[] = [
+                        'flag_order' => $flag_order,
+                        'table_id' => $rs->table_id,
+                        'remark' => $rs->remark,
+                        'status' => $status,
+                        'created' => $this->DateThai($rs->created_at),
+                        'action' => $action
+                    ];
+                }
             }
             $data = [
                 'data' => $info,
@@ -146,21 +167,36 @@ class Memberorder extends Controller
         if (count($order) > 0) {
             $info = [];
             foreach ($order as $rs) {
-                $status = '';
-                if ($rs->status == 1) {
-                    $status = '<button class="btn btn-sm btn-primary">กำลังทำอาหาร</button>';
+                $check = 0;
+                $categoryId = UsersCategories::where('users_id', Session::get('user')->id)->value('categories_id');
+                $orderDetailsGrouped = OrdersDetails::join('menus', 'orders_details.menu_id', '=', 'menus.id')
+                    ->where('orders_details.order_id', $rs->id)
+                    ->where('menus.categories_member_id', $categoryId)
+                    ->select('orders_details.*')
+                    ->with('menu', 'option')
+                    ->get()
+                    ->groupBy('menu_id');
+                if ($orderDetailsGrouped->isNotEmpty()) {
+                    $check = 1;
                 }
-                $flag_order = '<button class="btn btn-sm btn-warning">สั่งออนไลน์</button>';
-                $action = '<button data-id="' . $rs->id . '" type="button" class="btn btn-sm btn-outline-primary modalShow m-1">รายละเอียด</button>';
-                $info[] = [
-                    'flag_order' => $flag_order,
-                    'name' => $rs->name,
-                    'total' => $rs->total,
-                    'remark' => $rs->remark,
-                    'status' => $status,
-                    'created' => $this->DateThai($rs->created_at),
-                    'action' => $action
-                ];
+                if ($check == 1) {
+                    $status = '';
+                    if ($rs->status == 1) {
+                        $status = '<button class="btn btn-sm btn-primary">กำลังทำอาหาร</button>';
+                    }
+                    $flag_order = '<button class="btn btn-sm btn-warning">สั่งออนไลน์</button>';
+                    $action = '<button data-id="' . $rs->id . '" type="button" class="btn btn-sm btn-outline-primary modalShow m-1">รายละเอียด</button>
+                    <a href="' . route('printOrderRider', $rs->id) . '" target="_blank" type="button" class="btn btn-sm btn-outline-primary">ปริ้นออเดอร์</a>';
+                    $info[] = [
+                        'flag_order' => $flag_order,
+                        'name' => $rs->name,
+                        'total' => $rs->total,
+                        'remark' => $rs->remark,
+                        'status' => $status,
+                        'created' => $this->DateThai($rs->created_at),
+                        'action' => $action
+                    ];
+                }
             }
             $data = [
                 'data' => $info,
@@ -169,5 +205,87 @@ class Memberorder extends Controller
             ];
         }
         return response()->json($data);
+    }
+
+    public function printOrderAdmin($id)
+    {
+        $config = Config::first();
+        $getOrder = Orders::where('table_id', $id)->whereIn('status', [1, 2])->get();
+        $order_id = array();
+        if ($config->promptpay != '') {
+            $qr = Builder::staticMerchantPresentedQR($config->promptpay)->toSvgString();
+            $qr = str_replace('<svg', '<svg width="150" height="150"', $qr);
+            $qr = '<div style="width: 150px; height: 150px; overflow: hidden;">
+                        <div style="transform: scale(1.25); transform-origin: center;">
+                            ' . $qr . '
+                        </div>
+                    </div>';
+        } elseif ($config->image_qr != '') {
+            $qr = '<img width="150px" src="' . url('storage/' . $config->image_qr) . '">';
+        }
+        foreach ($getOrder as $rs) {
+            $order_id[] = $rs->id;
+        }
+        $categoryId = UsersCategories::where('users_id', Session::get('user')->id)->value('categories_id');
+        $order = OrdersDetails::whereIn('order_id', $order_id)
+            ->with('menu', 'option')
+            ->get();
+        return view('printOrder', compact('config', 'order', 'qr'));
+    }
+
+    public function printOrder($id)
+    {
+        $config = Config::first();
+        $getOrder = Orders::where('table_id', $id)->where('status', 1)->get();
+        $order_id = array();
+        if ($config->promptpay != '') {
+            $qr = Builder::staticMerchantPresentedQR($config->promptpay)->toSvgString();
+            $qr = str_replace('<svg', '<svg width="150" height="150"', $qr);
+            $qr = '<div style="width: 150px; height: 150px; overflow: hidden;">
+                        <div style="transform: scale(1.25); transform-origin: center;">
+                            ' . $qr . '
+                        </div>
+                    </div>';
+        } elseif ($config->image_qr != '') {
+            $qr = '<img width="150px" src="' . url('storage/' . $config->image_qr) . '">';
+        }
+        foreach ($getOrder as $rs) {
+            $order_id[] = $rs->id;
+        }
+        $categoryId = UsersCategories::where('users_id', Session::get('user')->id)->value('categories_id');
+        $order = OrdersDetails::join('menus', 'orders_details.menu_id', '=', 'menus.id')
+            ->whereIn('order_id', $order_id)
+            ->with('menu', 'option')
+            ->where('menus.categories_member_id', $categoryId)
+            ->get();
+        return view('printOrder', compact('config', 'order', 'qr'));
+    }
+
+    public function printOrderRider($id)
+    {
+        $config = Config::first();
+        $order_id = array();
+        if ($config->promptpay != '') {
+            $qr = Builder::staticMerchantPresentedQR($config->promptpay)->toSvgString();
+            $qr = str_replace('<svg', '<svg width="150" height="150"', $qr);
+            $qr = '<div style="width: 150px; height: 150px; overflow: hidden;">
+                        <div style="transform: scale(1.25); transform-origin: center;">
+                            ' . $qr . '
+                        </div>
+                    </div>';
+        } elseif ($config->image_qr != '') {
+            $qr = '<img width="150px" src="' . url('storage/' . $config->image_qr) . '">';
+        }
+        $getOrder = Orders::where('id', $id)->where('status', 1)->get();
+        foreach ($getOrder as $rs) {
+            $order_id[] = $rs->id;
+        }
+        $categoryId = UsersCategories::where('users_id', Session::get('user')->id)->value('categories_id');
+        $order = OrdersDetails::join('menus', 'orders_details.menu_id', '=', 'menus.id')
+            ->whereIn('order_id', $order_id)
+            ->with('menu', 'option')
+            ->where('menus.categories_member_id', $categoryId)
+            ->get();
+        return view('printOrder', compact('config', 'order', 'qr'));
     }
 }

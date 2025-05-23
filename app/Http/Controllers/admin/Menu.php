@@ -66,7 +66,7 @@ class Menu extends Controller
             $menu->name = $input['name'];
             $menu->categories_id = $input['categories_id'];
             $menu->detail = $input['detail'];
-            $menu->categories_member_id = $input['categories_member_id'];
+            $menu->categories_member_id = $input['categories_member_id'] ?? null;
             if ($menu->save()) {
                 if ($request->hasFile('file')) {
                     $file = $request->file('file');
@@ -85,7 +85,7 @@ class Menu extends Controller
             $menu->name = $input['name'];
             $menu->categories_id = $input['categories_id'];
             $menu->detail = $input['detail'];
-            $menu->categories_member_id = $input['categories_member_id'];
+            $menu->categories_member_id = $input['categories_member_id'] ?? null;
             if ($menu->save()) {
                 if ($request->hasFile('file')) {
                     $categories_file = MenuFiles::where('menu_id', $input['id'])->delete();

@@ -66,12 +66,6 @@
             font-size: 16px;
         }
 
-        .detail p {
-            margin: 4px 0;
-            font-size: 16px;
-            text-align: end;
-        }
-
         table {
             width: 100%;
             border-collapse: collapse;
@@ -126,16 +120,13 @@
     <div id="print-area">
         <div class="receipt">
             <h2><span>{{$config->name}}</span></h2>
+            <center>
+                <?= $qr ?>
+            </center>
             <div class="header">
                 <div class="info">
-                    <p><strong>เลขที่ใบเสร็จ #{{$pay->payment_number}}</strong></p>
-                    <p>วันที่: {{$pay->created_at}}</p>
-                </div>
-                <div class="detail">
-                    <p><strong>ชื่อ: {{$get['name']}}</strong></p>
-                    <p>เบอร์โทรศัพท์: {{$get['tel']}}</p>
-                    <p>เลขประจำตัวผู้เสียภาษี: {{$get['tax_id']}}</p>
-                    <p>ที่อยู่: {{$get['address']}}</p>
+                    <p><strong>เลขที่ใบเสร็จ #</strong></p>
+                    <p>วันที่: <?= date('Y-m-d H:i:s') ?></p>
                 </div>
             </div>
             <table>
@@ -147,17 +138,18 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <?php $pay = 0; ?>
                     @foreach($order as $rs)
                     <tr>
                         <td><?= $rs['menu']->name . ' (' . $rs['option']->type . ')' ?></td>
                         <td><?= $rs->quantity ?></td>
                         <td><?= number_format(($rs->quantity * $rs->price), '2') ?> ฿</td>
                     </tr>
+                    <?php $pay = ($rs->quantity * $rs->price) + $pay; ?>
                     @endforeach
                 </tbody>
             </table>
-
-            <p class="total">Total: <?= number_format($pay->total, '2') ?> ฿</p>
+            <p class="total">Total: <?= number_format($pay, '2') ?> ฿</p>
         </div>
     </div>
 </body>
