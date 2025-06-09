@@ -138,14 +138,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php $pay = 0; ?>
                     @foreach($order as $rs)
                     <tr>
-                        <td><?= $rs['menu']->name . ' (' . $rs['option']->type . ')' ?></td>
+                        <td>
+                            <div>{{ $rs['menu']->name }}</div>
+                            @foreach($rs['option'] as $option)
+                            <div style="font-size: 12px; color: #6b7280;">+ {{$option['option']->type}}</div>
+                            @endforeach
+                        </td>
                         <td><?= $rs->quantity ?></td>
-                        <td><?= number_format(($rs->quantity * $rs->price), '2') ?> ฿</td>
+                        <td><?= number_format($rs->price, '2') ?> ฿</td>
                     </tr>
-                    <?php $pay = ($rs->quantity * $rs->price) + $pay; ?>
                     @endforeach
                 </tbody>
             </table>

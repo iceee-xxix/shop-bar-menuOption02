@@ -213,6 +213,7 @@ Route::middleware(['role:admin'])->group(function () {
     //ผู้ดูแลเมนูออนไลน์
     Route::get('/admin/memberorderRider', [Memberorder::class, 'MemberorderRider'])->name('MemberorderRider');
     Route::post('/admin/memberorder/MemberorderlistOrderDetail', [Memberorder::class, 'MemberorderlistOrderDetail'])->name('MemberorderlistOrderDetail');
+    Route::post('/admin/memberorder/MemberorderlistOrderDetailRider', [Memberorder::class, 'listOrderDetailRider'])->name('MemberorderlistOrderDetailRider');
     //ปริ้นออเดอร์
     Route::get('/admin/order/printOrderAdmin/{id}', [Memberorder::class, 'printOrderAdmin'])->name('printOrderAdmin');
     Route::get('/admin/order/printOrderAdminCook/{id}', [Memberorder::class, 'printOrderAdminCook'])->name('printOrderAdminCook');

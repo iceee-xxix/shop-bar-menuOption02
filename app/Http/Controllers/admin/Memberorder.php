@@ -4,8 +4,10 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Config;
+use App\Models\MenuOption;
 use App\Models\Orders;
 use App\Models\OrdersDetails;
+use App\Models\OrdersOption;
 use App\Models\Table;
 use App\Models\User;
 use App\Models\UsersCategories;
@@ -108,41 +110,48 @@ class Memberorder extends Controller
     {
         $categoryId = UsersCategories::where('users_id', Session::get('user')->id)->value('categories_id');
         $orders = Orders::where('table_id', $request->input('id'))
-            ->where('status', 1)
+            ->whereIn('status', [1, 2])
             ->get();
         $info = '';
         foreach ($orders as $order) {
-            $orderDetailsGrouped = OrdersDetails::join('menus', 'orders_details.menu_id', '=', 'menus.id')
-                ->where('orders_details.order_id', $order->id)
-                ->where('menus.categories_member_id', $categoryId)
-                ->select('orders_details.*')
-                ->with('menu', 'option')
-                ->where('orders_details.status', 1)
-                ->get()
-                ->groupBy('menu_id');
-            if ($orderDetailsGrouped->isNotEmpty()) {
-                $info .= '<div class="mb-3">';
-                $info .= '<div class="row"><div class="col d-flex align-items-end"><h5 class="text-primary mb-2">เลขออเดอร์ #: ' . $order->id . '</h5></div></div>';
-                foreach ($orderDetailsGrouped as $details) {
-                    $menuName = optional($details->first()->menu)->name ?? 'ไม่พบชื่อเมนู';
-                    $info .= '<ul class="list-group mb-1 shadow-sm rounded">';
-                    foreach ($details as $detail) {
-                        $option = $detail->option;
-                        $optionType = $option ? $menuName . ' ' . $option->type : 'ไม่มีตัวเลือก';
-                        $priceTotal = number_format($detail->quantity * $detail->price, 2);
-
-                        $info .= '<li class="list-group-item d-flex bd-highlight align-items-center">';
-                        $info .= '<div class="flex-grow-1 bd-highlight"><small class="text-muted">' . htmlspecialchars($optionType) . '</small> — <span class="fw-medium">จำนวน ' . $detail->quantity . '</span></div>';
-                        $info .= '<button class="btn btn-sm btn-primary bd-highlight">' . $priceTotal . ' บาท</button>';
-                        if ($detail->status == 1) {
-                            $info .= '<button href="javascript:void(0)" class="btn btn-sm btn-info bd-highlight m-1 updatestatusMenu" data-id="' . $detail->id . '">อัพเดทสถานะ</button>';
+            $info .= '<div class="mb-3">';
+            $info .= '<div class="row"><div class="col d-flex align-items-end"><h5 class="text-primary mb-2">เลขออเดอร์ #: ' . $order->id . '</h5></div>
+            <div class="col-auto d-flex align-items-start">';
+            $info .= '</div></div>';
+            $orderDetails = OrdersDetails::where('order_id', $order->id)->get()->groupBy('menu_id');
+            foreach ($orderDetails as $details) {
+                $menuName = optional($details->first()->menu)->name ?? 'ไม่พบชื่อเมนู';
+                $orderOption = OrdersOption::where('order_detail_id', $details->first()->id)->get();
+                foreach ($details as $detail) {
+                    $detailsText = [];
+                    if ($orderOption->isNotEmpty()) {
+                        foreach ($orderOption as $key => $option) {
+                            $optionName = MenuOption::find($option->option_id);
+                            $detailsText[] = $optionName->type;
                         }
-                        $info .= '</li>';
+                        $detailsText = implode(',', $detailsText);
                     }
+                    $optionType = $menuName;
+                    $priceTotal = number_format($detail->price, 2);
+                    $info .= '<ul class="list-group mb-1 shadow-sm rounded">';
+                    $info .= '<li class="list-group-item d-flex justify-content-between align-items-start">';
+                    $info .= '<div class="flex-grow-1">';
+                    $info .= '<div><span class="fw-bold">' . htmlspecialchars($optionType) . '</span></div>';
+                    if (!empty($detailsText)) {
+                        $info .= '<div class="small text-secondary mb-1 ps-2">+ ' . $detailsText . '</div>';
+                    }
+                    $info .= '</div>';
+                    $info .= '<div class="text-end d-flex flex-column align-items-end">';
+                    $info .= '<div class="mb-1">จำนวน: ' . $detail->quantity . '</div>';
+                    $info .= '<div>';
+                    $info .= '<button class="btn btn-sm btn-primary me-1">' . $priceTotal . ' บาท</button>';
+                    $info .= '</div>';
+                    $info .= '</div>';
+                    $info .= '</li>';
                     $info .= '</ul>';
                 }
-                $info .= '</div>';
             }
+            $info .= '</div>';
         }
         echo $info;
     }
@@ -325,5 +334,60 @@ class Memberorder extends Controller
             ->where('menus.categories_member_id', $categoryId)
             ->get();
         return view('printOrder', compact('config', 'order', 'qr'));
+    }
+
+    public function listOrderDetailRider(Request $request)
+    {
+        $orderId = $request->input('id');
+        $order = Orders::find($orderId);
+        $info = '';
+
+        if ($order) {
+            $orderDetails = OrdersDetails::where('order_id', $orderId)->get()->groupBy('menu_id');
+            $info .= '<div class="mb-3">';
+            $info .= '<div class="row">';
+            $info .= '<div class="col d-flex align-items-end"><h5 class="text-primary mb-2">เลขออเดอร์ #: ' . $orderId . '</h5></div>';
+            $info .= '<div class="col-auto d-flex align-items-start">';
+            $info .= '</div></div>';
+
+            foreach ($orderDetails as $details) {
+                $menuName = optional($details->first()->menu)->name ?? 'ไม่พบชื่อเมนู';
+                $orderOption = OrdersOption::where('order_detail_id', $details->first()->id)->get();
+
+                $detailsText = [];
+                if ($orderOption->isNotEmpty()) {
+                    foreach ($orderOption as $option) {
+                        $optionName = MenuOption::find($option->option_id);
+                        $detailsText[] = $optionName->type;
+                    }
+                }
+
+                foreach ($details as $detail) {
+                    $priceTotal = number_format($detail->price, 2);
+                    $info .= '<ul class="list-group mb-1 shadow-sm rounded">';
+                    $info .= '<li class="list-group-item d-flex justify-content-between align-items-start">';
+                    $info .= '<div class="flex-grow-1">';
+                    $info .= '<div><span class="fw-bold">' . htmlspecialchars($menuName) . '</span></div>';
+
+                    if (!empty($detailsText)) {
+                        $info .= '<div class="small text-secondary mb-1 ps-2">+ ' . implode(',', $detailsText) . '</div>';
+                    }
+
+                    $info .= '</div>';
+                    $info .= '<div class="text-end d-flex flex-column align-items-end">';
+                    $info .= '<div class="mb-1">จำนวน: ' . $detail->quantity . '</div>';
+                    $info .= '<div>';
+                    $info .= '<button class="btn btn-sm btn-primary me-1">' . $priceTotal . ' บาท</button>';
+                    $info .= '</div>';
+                    $info .= '</div>';
+                    $info .= '</li>';
+                    $info .= '</ul>';
+                }
+            }
+
+            $info .= '</div>';
+        }
+
+        echo $info;
     }
 }
