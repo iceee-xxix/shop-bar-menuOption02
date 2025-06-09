@@ -9,34 +9,33 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 5px 0;
-            color: black;
+            padding: 20px 0;
+            color: #2d2d2d;
             background: #ffffff;
             /* ชัดเจนว่าให้พื้นหลังขาว */
         }
 
         .receipt {
             width: 100%;
-            max-width: 500px;
+            max-width: 420px;
             margin: 0 auto;
             /* จัดให้อยู่กึ่งกลางแนวนอน */
             background: #ffffff;
-            /* border: 1px solid black; */
-            padding: 10px;
+            border: 1px solid #e2e8f0;
+            padding: 30px;
             border-radius: 5px;
         }
 
         .receipt h2 {
             text-align: center;
             margin-top: 5px;
-            font-size: 30px;
-            margin-bottom: 0px;
-            font-weight: bold;
-            color: black;
+            margin-bottom: 20px;
+            font-weight: 600;
+            color: #1e293b;
         }
 
         .receipt span {
-            font-weight: bold;
+            font-weight: 700;
         }
 
         .header {
@@ -57,13 +56,13 @@
 
         .header .tax-label {
             text-align: right;
-            font-weight: bold;
-            color: black;
+            font-weight: 600;
+            color: #475569;
         }
 
         .info p {
             margin: 4px 0;
-            font-size: 20px;
+            font-size: 14px;
         }
 
         table {
@@ -75,7 +74,8 @@
         th,
         td {
             padding: 10px;
-            font-size: 20px;
+            font-size: 14px;
+            border-bottom: 1px solid #e2e8f0;
         }
 
         th:nth-child(1),
@@ -98,20 +98,38 @@
 
         .total {
             text-align: right;
-            font-weight: bold;
-            color: black;
+            font-weight: 700;
+            color: #1e293b;
             border-top: 2px solid #000;
             margin-top: 20px;
             padding-top: 12px;
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .footer {
             margin-top: 40px;
             text-align: center;
             font-size: 13px;
-            color: black;
+            color: #64748b;
             line-height: 1.6;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            #print-area,
+            #print-area * {
+                visibility: visible;
+            }
+
+            #print-area {
+                position: absolute;
+                top: 20;
+                left: 0;
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -137,9 +155,14 @@
                 <tbody>
                     @foreach($order as $rs)
                     <tr>
-                        <td><?= $rs['menu']->name . ' (' . $rs['option']->type . ')' ?></td>
+                        <td>
+                            <div>{{ $rs['menu']->name }}</div>
+                            @foreach($rs['option'] as $option)
+                            <div style="font-size: 12px; color: #6b7280;">+ {{$option['option']->type}}</div>
+                            @endforeach
+                        </td>
                         <td><?= $rs->quantity ?></td>
-                        <td><?= number_format(($rs->quantity * $rs->price), '2') ?> ฿</td>
+                        <td><?= number_format($rs->price, '2') ?> ฿</td>
                     </tr>
                     @endforeach
                 </tbody>

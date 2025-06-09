@@ -8,15 +8,9 @@
         <div class="row">
             <div class="col-12">
                 <div class="card">
-                    <div class="card-header">
-                        <div class="row d-flex justify-content-between">
-                            <div class="col-6">
-                                {{$info->name}}
-                            </div>
-                            <div class="col-auto">
-                                <a href="{{route('menulistOptionCreate',$id)}}" class="btn btn-sm btn-outline-success d-flex align-items-center" style="font-size:14px">เพิ่มราคาอาหาร&nbsp;<i class="bx bxs-plus-circle"></i></a>
-                            </div>
-                        </div>
+                    <div class="card-header d-flex justify-content-end">
+                        <a href="{{route('menuTypeOption',$info->menu_id)}}" class="btn btn-sm btn-outline-primary mx-1" style="font-size:14px">ย้อนกลับ</a>
+                        <a href="{{route('menulistOptionCreate',$id)}}" class="btn btn-sm btn-outline-success d-flex align-items-center" style="font-size:14px">เพิ่มราคาอาหาร&nbsp;<i class="bx bxs-plus-circle"></i></a>
                     </div>
                     <div class="card-body">
                         <table id="myTable" class="display" style="width:100%">

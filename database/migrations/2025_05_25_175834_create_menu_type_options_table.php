@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('menus', function (Blueprint $table) {
+        Schema::create('menu_type_options', function (Blueprint $table) {
             $table->id();
-            $table->integer('categories_id');
-            $table->integer('categories_member_id')->nullable();
+            $table->integer('menu_id')->nullable();
             $table->text('name')->nullable();
-            $table->text('detail')->nullable();
-            $table->text('base_price')->nullable();
+            $table->integer('is_selected')->default(0);
+            $table->integer('amout')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -28,7 +27,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('menus', function (Blueprint $table) {
+        Schema::table('menu_type_options', function (Blueprint $table) {
             $table->dropSoftDeletes(); // Removes deleted_at column
         });
     }

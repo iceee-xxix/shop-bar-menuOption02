@@ -10,6 +10,7 @@ use App\Models\Menu;
 use App\Models\MenuOption;
 use App\Models\Orders;
 use App\Models\OrdersDetails;
+use App\Models\OrdersOption;
 use App\Models\Pay;
 use App\Models\PayGroup;
 use App\Models\RiderSend;
@@ -132,24 +133,36 @@ class Admin extends Controller
             $orderDetails = OrdersDetails::where('order_id', $order->id)->get()->groupBy('menu_id');
             foreach ($orderDetails as $details) {
                 $menuName = optional($details->first()->menu)->name ?? 'ไม่พบชื่อเมนู';
-                $info .= '<ul class="list-group mb-1 shadow-sm rounded">';
+                $orderOption = OrdersOption::where('order_detail_id', $details->first()->id)->get();
                 foreach ($details as $detail) {
-                    $option = MenuOption::find($detail->option_id);
-                    $optionType = $option ? $menuName . ' ' .  $option->type : 'ไม่มีตัวเลือก';
-                    $priceTotal = number_format($detail->quantity * $detail->price, 2);
-                    $info .= '<li class="list-group-item d-flex bd-highlight align-items-center">';
-                    $info .= '<div class="flex-grow-1 bd-highlight"><small class="text-muted">' . htmlspecialchars($optionType) . '</small> — <span class="fw-medium">จำนวน ' . $detail->quantity . '</span></div>';
-                    if ($detail->status == 1) {
-                        $info .= '<button class="btn btn-sm btn-primary">กำลังทำอาหาร</button>';
+                    $detailsText = [];
+                    if ($orderOption->isNotEmpty()) {
+                        foreach ($orderOption as $key => $option) {
+                            $optionName = MenuOption::find($option->option_id);
+                            $detailsText[] = $optionName->type;
+                        }
+                        $detailsText = implode(',', $detailsText);
                     }
-                    if ($detail->status == 2) {
-                        $info .= '<button class="btn btn-sm btn-success">ทำอาหารเสร็จ</button>';
+                    $optionType = $menuName;
+                    $priceTotal = number_format($detail->price, 2);
+                    $info .= '<ul class="list-group mb-1 shadow-sm rounded">';
+                    $info .= '<li class="list-group-item d-flex justify-content-between align-items-start">';
+                    $info .= '<div class="flex-grow-1">';
+                    $info .= '<div><span class="fw-bold">' . htmlspecialchars($optionType) . '</span></div>';
+                    if (!empty($detailsText)) {
+                        $info .= '<div class="small text-secondary mb-1 ps-2">+ ' . $detailsText . '</div>';
                     }
-                    $info .= '<button class="btn btn-sm btn-primary bd-highlight m-1">' . $priceTotal . ' บาท</button>';
-                    $info .= '<button href="javascript:void(0)" class="btn btn-sm btn-danger bd-highlight m-1 cancelMenuSwal" data-id="' . $detail->id . '">ยกเลิก</button>';
+                    $info .= '</div>';
+                    $info .= '<div class="text-end d-flex flex-column align-items-end">';
+                    $info .= '<div class="mb-1">จำนวน: ' . $detail->quantity . '</div>';
+                    $info .= '<div>';
+                    $info .= '<button class="btn btn-sm btn-primary me-1">' . $priceTotal . ' บาท</button>';
+                    $info .= '<button href="javascript:void(0)" class="btn btn-sm btn-danger cancelMenuSwal" data-id="' . $detail->id . '">ยกเลิก</button>';
+                    $info .= '</div>';
+                    $info .= '</div>';
                     $info .= '</li>';
+                    $info .= '</ul>';
                 }
-                $info .= '</ul>';
             }
             $info .= '</div>';
         }
@@ -391,17 +404,35 @@ class Admin extends Controller
                 $info .= '<div class="row"><div class="col d-flex align-items-end"><h5 class="text-primary mb-2">เลขออเดอร์ #: ' . $pg->order_id . '</h5></div></div>';
                 foreach ($orderDetailsGrouped as $details) {
                     $menuName = optional($details->first()->menu)->name ?? 'ไม่พบชื่อเมนู';
-                    $info .= '<ul class="list-group mb-1 shadow-sm rounded">';
+                    $orderOption = OrdersOption::where('order_detail_id', $details->first()->id)->get();
                     foreach ($details as $detail) {
-                        $option = $detail->option;
-                        $optionType = $option ? $menuName . ' ' . $option->type : 'ไม่มีตัวเลือก';
-                        $priceTotal = number_format($detail->quantity * $detail->price, 2);
-                        $info .= '<li class="list-group-item d-flex bd-highlight align-items-center">';
-                        $info .= '<div class="flex-grow-1 bd-highlight"><small class="text-muted">' . htmlspecialchars($optionType) . '</small> — <span class="fw-medium">จำนวน ' . $detail->quantity . '</span></div>';
-                        $info .= '<button class="btn btn-sm btn-primary bd-highlight">' . $priceTotal . ' บาท</button>';
+                        $detailsText = [];
+                        if ($orderOption->isNotEmpty()) {
+                            foreach ($orderOption as $key => $option) {
+                                $optionName = MenuOption::find($option->option_id);
+                                $detailsText[] = $optionName->type;
+                            }
+                            $detailsText = implode(',', $detailsText);
+                        }
+                        $optionType = $menuName;
+                        $priceTotal = number_format($detail->price, 2);
+                        $info .= '<ul class="list-group mb-1 shadow-sm rounded">';
+                        $info .= '<li class="list-group-item d-flex justify-content-between align-items-start">';
+                        $info .= '<div class="flex-grow-1">';
+                        $info .= '<div><span class="fw-bold">' . htmlspecialchars($optionType) . '</span></div>';
+                        if (!empty($detailsText)) {
+                            $info .= '<div class="small text-secondary mb-1 ps-2">+ ' . $detailsText . '</div>';
+                        }
+                        $info .= '</div>';
+                        $info .= '<div class="text-end d-flex flex-column align-items-end">';
+                        $info .= '<div class="mb-1">จำนวน: ' . $detail->quantity . '</div>';
+                        $info .= '<div>';
+                        $info .= '<button class="btn btn-sm btn-primary me-1">' . $priceTotal . ' บาท</button>';
+                        $info .= '</div>';
+                        $info .= '</div>';
                         $info .= '</li>';
+                        $info .= '</ul>';
                     }
-                    $info .= '</ul>';
                 }
                 $info .= '</div>';
             }
@@ -419,7 +450,7 @@ class Admin extends Controller
             $order_id[] = $rs->order_id;
         }
         $order = OrdersDetails::whereIn('order_id', $order_id)
-            ->with('menu', 'option')
+            ->with('menu', 'option.option')
             ->get();
         return view('tax', compact('config', 'pay', 'order'));
     }
@@ -436,7 +467,7 @@ class Admin extends Controller
             $order_id[] = $rs->order_id;
         }
         $order = OrdersDetails::whereIn('order_id', $order_id)
-            ->with('menu', 'option')
+            ->with('menu', 'option.option')
             ->get();
         return view('taxfull', compact('config', 'pay', 'order', 'get'));
     }
@@ -506,40 +537,61 @@ class Admin extends Controller
     public function listOrderDetailRider(Request $request)
     {
         $orderId = $request->input('id');
-        $orders = OrdersDetails::select('menu_id')
-            ->where('order_id', $orderId)
-            ->groupBy('menu_id')
-            ->get();
+        $order = Orders::find($orderId);
         $info = '';
-        if (count($orders) > 0) {
+
+        if ($order) {
+            $orderDetails = OrdersDetails::where('order_id', $orderId)->get()->groupBy('menu_id');
             $info .= '<div class="mb-3">';
             $info .= '<div class="row">';
             $info .= '<div class="col d-flex align-items-end"><h5 class="text-primary mb-2">เลขออเดอร์ #: ' . $orderId . '</h5></div>';
             $info .= '<div class="col-auto d-flex align-items-start">';
-            $info .= '<button href="javascript:void(0)" class="btn btn-sm btn-danger cancelOrderSwal m-1" data-id="' . $orderId . '">ยกเลิกออเดอร์</button>';
-            $info .= '</div></div>';
-            foreach ($orders as $value) {
-                $order = OrdersDetails::where('order_id', $orderId)
-                    ->where('menu_id', $value->menu_id)
-                    ->with('menu', 'option')
-                    ->get();
-                $info .= '<ul class="list-group mb-1 shadow-sm rounded">';
-                foreach ($order as $rs) {
-                    $optionType = htmlspecialchars($rs['option']->type ?? 'ไม่มีตัวเลือก');
-                    $priceTotal = number_format($rs->quantity * $rs->price, 2);
-                    $info .= '<li class="list-group-item d-flex bd-highlight align-items-center">';
-                    $info .= '<div class="flex-grow-1 bd-highlight">';
-                    $info .= '<small class="text-muted">' . $rs['menu']->name . ' ' . $optionType . '</small> — ';
-                    $info .= '<span class="fw-medium">จำนวน ' . $rs->quantity . '</span>';
-                    $info .= '</div>';
-                    $info .= '<button class="btn btn-sm btn-primary bd-highlight">' . $priceTotal . ' บาท</button>';
-                    $info .= '<button href="javascript:void(0)" class="btn btn-sm btn-danger bd-highlight m-1 cancelMenuSwal" data-id="' . $rs->id . '">ยกเลิก</button>';
-                    $info .= '</li>';
-                }
-                $info .= '</ul>';
+
+            if ($order->status != 2) {
+                $info .= '<button href="javascript:void(0)" class="btn btn-sm btn-danger cancelOrderSwal m-1" data-id="' . $orderId . '">ยกเลิกออเดอร์</button>';
             }
+
+            $info .= '</div></div>';
+
+            foreach ($orderDetails as $details) {
+                $menuName = optional($details->first()->menu)->name ?? 'ไม่พบชื่อเมนู';
+                $orderOption = OrdersOption::where('order_detail_id', $details->first()->id)->get();
+
+                $detailsText = [];
+                if ($orderOption->isNotEmpty()) {
+                    foreach ($orderOption as $option) {
+                        $optionName = MenuOption::find($option->option_id);
+                        $detailsText[] = $optionName->type;
+                    }
+                }
+
+                foreach ($details as $detail) {
+                    $priceTotal = number_format($detail->price, 2);
+                    $info .= '<ul class="list-group mb-1 shadow-sm rounded">';
+                    $info .= '<li class="list-group-item d-flex justify-content-between align-items-start">';
+                    $info .= '<div class="flex-grow-1">';
+                    $info .= '<div><span class="fw-bold">' . htmlspecialchars($menuName) . '</span></div>';
+
+                    if (!empty($detailsText)) {
+                        $info .= '<div class="small text-secondary mb-1 ps-2">+ ' . implode(',', $detailsText) . '</div>';
+                    }
+
+                    $info .= '</div>';
+                    $info .= '<div class="text-end d-flex flex-column align-items-end">';
+                    $info .= '<div class="mb-1">จำนวน: ' . $detail->quantity . '</div>';
+                    $info .= '<div>';
+                    $info .= '<button class="btn btn-sm btn-primary me-1">' . $priceTotal . ' บาท</button>';
+                    $info .= '<button href="javascript:void(0)" class="btn btn-sm btn-danger cancelMenuSwal" data-id="' . $detail->id . '">ยกเลิก</button>';
+                    $info .= '</div>';
+                    $info .= '</div>';
+                    $info .= '</li>';
+                    $info .= '</ul>';
+                }
+            }
+
             $info .= '</div>';
         }
+
         echo $info;
     }
 

@@ -8,6 +8,7 @@ use App\Models\Categories_member;
 use App\Models\Menu as ModelsMenu;
 use App\Models\MenuFiles;
 use App\Models\MenuOption;
+use App\Models\MenuTypeOption;
 use Illuminate\Http\Request;
 
 class Menu extends Controller
@@ -31,13 +32,13 @@ class Menu extends Controller
         if (count($menu) > 0) {
             $info = [];
             foreach ($menu as $rs) {
-                $price = '<a href="' . route('menuOption', $rs->id) . '" class="btn btn-sm btn-outline-primary" title="แก้ไข"><i class="bx bx-list-ol"></i></a>';
+                $option = '<a href="' . route('menuTypeOption', $rs->id) . '" class="btn btn-sm btn-outline-primary" title="ตัวเลือก"><i class="bx bx-list-check"></i></a>';
                 $action = '<a href="' . route('menuEdit', $rs->id) . '" class="btn btn-sm btn-outline-primary" title="แก้ไข"><i class="bx bx-edit-alt"></i></a>
                 <button type="button" data-id="' . $rs->id . '" class="btn btn-sm btn-outline-danger deleteMenu" title="ลบ"><i class="bx bxs-trash"></i></button>';
                 $info[] = [
                     'name' => $rs->name,
                     'category' => $rs['category']->name,
-                    'price' => $price,
+                    'option' => $option,
                     'action' => $action
                 ];
             }
@@ -65,6 +66,7 @@ class Menu extends Controller
             $menu = new ModelsMenu();
             $menu->name = $input['name'];
             $menu->categories_id = $input['categories_id'];
+            $menu->base_price = $input['base_price'];
             $menu->detail = $input['detail'];
             $menu->categories_member_id = $input['categories_member_id'] ?? null;
             if ($menu->save()) {
@@ -84,6 +86,7 @@ class Menu extends Controller
             $menu = ModelsMenu::find($input['id']);
             $menu->name = $input['name'];
             $menu->categories_id = $input['categories_id'];
+            $menu->base_price = $input['base_price'];
             $menu->detail = $input['detail'];
             $menu->categories_member_id = $input['categories_member_id'] ?? null;
             if ($menu->save()) {
@@ -139,7 +142,7 @@ class Menu extends Controller
     {
         $data['function_key'] = 'menu';
         $data['id'] = $id;
-        $data['info'] = ModelsMenu::find($id);
+        $data['info'] = MenuTypeOption::find($id);
         return view('menu.option.index', $data);
     }
 
@@ -151,7 +154,7 @@ class Menu extends Controller
             'message' => '',
             'data' => []
         ];
-        $menuOption = MenuOption::where('menu_id', $id)->get();
+        $menuOption = MenuOption::where('menu_type_option_id', $id)->get();
 
         if (count($menuOption) > 0) {
             $info = [];
@@ -187,12 +190,12 @@ class Menu extends Controller
         $input = $request->input();
         $menu = new menuOption();
         $menu->type = $input['name'];
-        $menu->price = $input['price'];
-        $menu->menu_id = $input['menu_id'];
+        $menu->price = ($input['price'] != '') ? $input['price'] : 0;
+        $menu->menu_type_option_id = $input['menu_type_option_id'];
         if ($menu->save()) {
-            return redirect()->route('menuOption', $input['menu_id'])->with('success', 'บันทึกรายการเรียบร้อยแล้ว');
+            return redirect()->route('menuOption', $input['menu_type_option_id'])->with('success', 'บันทึกรายการเรียบร้อยแล้ว');
         }
-        return redirect()->route('menuOption', $input['menu_id'])->with('error', 'ไม่สามารถบันทึกข้อมูลได้');
+        return redirect()->route('menuOption', $input['menu_type_option_id'])->with('error', 'ไม่สามารถบันทึกข้อมูลได้');
     }
 
     public function menuOptionEdit($id)
@@ -208,12 +211,13 @@ class Menu extends Controller
         $input = $request->input();
         $menu = menuOption::find($input['id']);
         $menu->type = $input['name'];
-        $menu->price = $input['price'];
+        $menu->price = ($input['price'] != '') ? $input['price'] : 0;
         if ($menu->save()) {
-            return redirect()->route('menuOption', $menu->menu_id)->with('success', 'บันทึกรายการเรียบร้อยแล้ว');
+            return redirect()->route('menuOption', $menu->menu_type_option_id)->with('success', 'บันทึกรายการเรียบร้อยแล้ว');
         }
         return redirect()->route('menu')->with('error', 'ไม่สามารถบันทึกข้อมูลได้');
     }
+
 
     public function menuOptionDelete(Request $request)
     {

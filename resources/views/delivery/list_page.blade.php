@@ -68,6 +68,24 @@ $config = Config::first();
         background: linear-gradient(360deg, var(--sub-color), var(--primary-color));
         cursor: pointer;
     }
+
+    .btn-edit {
+        background: transparent;
+        /* ไม่มีพื้นหลัง */
+        color: rgb(206, 0, 0);
+        /* ตัวหนังสือสีแดง */
+        border: none;
+        /* ไม่มีเส้นขอบ */
+        font-size: 12px;
+        /* ขนาดตัวอักษร */
+        text-decoration: underline;
+        /* มีเส้นใต้ */
+        padding: 0;
+        /* เอา padding ออกเพื่อไม่ให้เกินขอบ */
+        margin-top: -8px;
+        cursor: pointer;
+        /* เปลี่ยนเมาส์เป็น pointer */
+    }
 </style>
 <div class="container">
     <div class="d-flex flex-column justify-content-center gap-2">
@@ -138,100 +156,108 @@ $config = Config::first();
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        let orderData = JSON.parse(localStorage.getItem('orderData')) || {};
         const container = document.getElementById('order-summary');
         const totalPriceEl = document.getElementById('total-price');
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        console.log(cart)
 
         function renderOrderList() {
+
             container.innerHTML = '';
             let total = 0;
-
-            if (Object.keys(orderData).length === 0) {
+            if (cart.length === 0) {
                 const noItemsMessage = document.createElement('div');
                 noItemsMessage.textContent = "ท่านยังไม่ได้เลือกสินค้า";
                 container.appendChild(noItemsMessage);
             } else {
-                for (const name in orderData) {
-                    for (const type in orderData[name]) {
-                        const item = orderData[name][type];
-                        if (item.qty > 0) {
-                            const el = document.createElement('div');
-                            el.classList.add('d-flex', 'justify-content-between', 'align-items-center', 'mb-1');
-
-                            const itemText = document.createElement('div');
-                            itemText.textContent = `${name} (${type}) x${item.qty}`;
-
-                            const rightSide = document.createElement('div');
-                            rightSide.classList.add('d-flex', 'align-items-center', 'gap-2');
-
-                            const priceText = document.createElement('div');
-                            priceText.textContent = `${item.qty * item.price}`;
-
-                            const deleteBtn = document.createElement('button');
-                            deleteBtn.classList.add('btn-delete');
-                            deleteBtn.textContent = 'ลบ';
-                            deleteBtn.onclick = () => {
-                                item.qty -= 1;
-
-                                if (item.qty <= 0) {
-                                    delete orderData[name][type];
-                                    if (Object.keys(orderData[name]).length === 0) {
-                                        delete orderData[name];
-                                    }
-                                }
-
-                                localStorage.setItem('orderData', JSON.stringify(orderData));
-                                renderOrderList();
-                            };
-
-                            const plusBtn = document.createElement('button');
-                            plusBtn.classList.add('btn-plus');
-                            plusBtn.textContent = 'เพิ่ม';
-                            plusBtn.onclick = () => {
-                                item.qty += 1;
-                                localStorage.setItem('orderData', JSON.stringify(orderData));
-                                renderOrderList();
-                            };
-
-                            rightSide.appendChild(priceText);
-                            rightSide.appendChild(plusBtn);
-                            rightSide.appendChild(deleteBtn);
-
-                            el.appendChild(itemText);
-                            el.appendChild(rightSide);
-                            container.appendChild(el);
-
-                            total += item.qty * item.price;
-                        }
+                const mergedItems = {};
+                cart.forEach(item => {
+                    if (!mergedItems[item.name]) {
+                        mergedItems[item.name] = [];
                     }
+                    mergedItems[item.name].push(item);
+                });
+
+                for (const name in mergedItems) {
+                    const groupedItems = mergedItems[name];
+                    let totalPrice = 0;
+
+                    groupedItems.forEach(item => {
+                        totalPrice += item.total_price;
+
+                        const optionsText = (item.options && item.options.length) ?
+                            item.options.map(opt => opt.label).join(', ') :
+                            '-';
+
+                        const row = document.createElement('div');
+                        row.className =
+                            'row justify-content-between align-items-start fs-6 mb-2 text-start px-1';
+
+                        const leftCol = document.createElement('div');
+                        leftCol.className = 'col-9 d-flex flex-column justify-content-start lh-sm';
+
+                        const title = document.createElement('div');
+                        title.className = 'card-title m-0';
+                        title.textContent = item.name + " x" + item.amount;
+
+                        const optionTextEl = document.createElement('div');
+                        optionTextEl.className = 'text-muted';
+                        optionTextEl.style.fontSize = '12px';
+                        optionTextEl.textContent = optionsText;
+
+                        leftCol.appendChild(title);
+                        leftCol.appendChild(optionTextEl);
+
+                        const rightCol = document.createElement('div');
+                        rightCol.className = 'col-2 d-flex flex-column align-items-end';
+
+                        const priceText = document.createElement('div');
+                        priceText.textContent = item.total_price.toLocaleString();
+
+                        const editBtn = document.createElement('a');
+                        editBtn.className = 'btn-edit';
+                        editBtn.textContent = 'แก้ไข';
+                        editBtn.href = `/detail/${item.category_id}#select-${item.id}&uuid=${item.uuid}`;
+
+                        rightCol.appendChild(priceText);
+                        rightCol.appendChild(editBtn);
+
+                        row.appendChild(leftCol);
+                        row.appendChild(rightCol);
+                        container.appendChild(row);
+                    });
+
+
+                    total += totalPrice;
                 }
             }
 
-            totalPriceEl.textContent = `${total}`;
+            totalPriceEl.textContent = total.toLocaleString();
         }
 
         renderOrderList();
-    });
-</script>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const orderData = JSON.parse(localStorage.getItem('orderData')) || {};
 
         const confirmButton = document.getElementById('confirm-order-btn');
 
-        if (Object.keys(orderData).length > 0) {
-            confirmButton.style.display = 'inline-block';
+        function toggleConfirmButton(cart) {
+            if (Object.keys(cart).length > 0) {
+                confirmButton.style.display = 'inline-block';
+            } else {
+                confirmButton.style.display = 'none';
+            }
         }
+
+
+        toggleConfirmButton(cart);
 
         confirmButton.addEventListener('click', function(event) {
             event.preventDefault();
-            if (Object.keys(orderData).length > 0) {
+            if (Object.keys(cart).length > 0) {
                 $.ajax({
                     type: "post",
                     url: "{{ route('delivery.SendOrder') }}",
                     data: {
-                        orderData: orderData,
+                        cart: cart,
                         remark: $('#remark').val()
                     },
                     headers: {
@@ -241,7 +267,7 @@ $config = Config::first();
                     success: function(response) {
                         if (response.status == true) {
                             Swal.fire(response.message, "", "success");
-                            localStorage.removeItem('orderData');
+                            localStorage.removeItem('cart');
                             setTimeout(() => {
                                 location.reload();
                             }, 3000);

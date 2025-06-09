@@ -21,6 +21,6 @@ class OrdersDetails extends Model
 
     public function option()
     {
-        return $this->belongsTo(MenuOption::class, 'option_id');
+        return $this->hasMany(OrdersOption::class, 'order_detail_id');
     }
 }

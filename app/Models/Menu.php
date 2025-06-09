@@ -21,7 +21,8 @@ class Menu extends Model
         return $this->hasOne(MenuFiles::class, 'menu_id');
     }
 
-    public function option(){
-        return $this->hasMany(MenuOption::class, 'menu_id');
+    public function option()
+    {
+        return $this->hasMany(MenuTypeOption::class, 'menu_id');
     }
 }

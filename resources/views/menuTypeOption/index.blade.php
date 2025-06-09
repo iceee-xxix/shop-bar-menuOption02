@@ -9,15 +9,15 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-end">
-                        <a href="{{route('MenuCreate')}}" class="btn btn-sm btn-outline-success" style="font-size:14px">เพิ่มเมนู&nbsp;<i class="bx bxs-plus-circle"></i></a>
+                        <a href="{{route('menu')}}" class="btn btn-sm btn-outline-primary mx-1" style="font-size:14px">ย้อนกลับ</a>
+                        <a href="{{route('MenuTypeOptionCreate',$id)}}" class="btn btn-sm btn-outline-success" style="font-size:14px">เพิ่มตัวเลือก&nbsp;<i class="bx bxs-plus-circle"></i></a>
                     </div>
                     <div class="card-body">
                         <table id="myTable" class="display" style="width:100%">
                             <thead>
                                 <tr>
-                                    <th>เมนู</th>
-                                    <th class="text-center">หมวดหมู่</th>
-                                    <th class="text-center">ตัวเลือก</th>
+                                    <th>ชื่อตัวเลือก</th>
+                                    <th class="text-center">กำหนดราคา</th>
                                     <th class="text-center">จัดการ</th>
                                 </tr>
                             </thead>
@@ -43,21 +43,19 @@
             },
             processing: true,
             ajax: {
-                url: "{{route('menulistData')}}",
+                url: "{{route('menuTypeOptionlistData')}}",
                 type: "post",
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                data: {
+                    id: '{{$id}}'
                 },
             },
             columns: [{
                     data: 'name',
                     class: 'text-left',
-                    width: '40%'
-                },
-                {
-                    data: 'category',
-                    class: 'text-center',
-                    width: '20%',
+                    width: '60%'
                 },
                 {
                     data: 'option',
@@ -78,7 +76,7 @@
         e.preventDefault();
         var id = $(this).data('id');
         Swal.fire({
-            title: "ท่านต้องการลบเมนูใช่หรือไม่?",
+            title: "ท่านต้องการลบตัวเลือกใช่หรือไม่?",
             icon: "question",
             showDenyButton: true,
             confirmButtonText: "ตกลง",
@@ -86,7 +84,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: "{{route('menuDelete')}}",
+                    url: "{{route('menuTypeOptionDelete')}}",
                     type: "post",
                     data: {
                         id: id

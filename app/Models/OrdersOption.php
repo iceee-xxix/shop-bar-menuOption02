@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class MenuOption extends Model
+class OrdersOption extends Model
 {
     use HasFactory;
-    use SoftDeletes;
+
+    public function option()
+    {
+        return $this->belongsTo(MenuOption::class, 'option_id');
+    }
 }

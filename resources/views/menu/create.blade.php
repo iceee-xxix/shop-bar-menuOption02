@@ -7,7 +7,7 @@
         <div class="row">
             <div class="col-lg-12 col-md-12 order-1">
                 <div class="row d-flex justify-content-center">
-                    <div class="col-8">
+                    <div class="col-12">
                         <form action="{{route('menuSave')}}" method="post" enctype="multipart/form-data">
                             @csrf
                             <div class="card">
@@ -20,6 +20,12 @@
                                         <div class="col-md-12">
                                             <label for="name" class="form-label">ชื่อเมนู : </label>
                                             <input type="text" class="form-control" id="name" name="name" required>
+                                        </div>
+                                    </div>
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-12">
+                                            <label for="base_price" class="form-label">ราคา : </label>
+                                            <input type="text" class="form-control" id="base_price" name="base_price" onkeypress="return event.charCode >= 48 && event.charCode <= 57" required>
                                         </div>
                                     </div>
                                     <div class="row g-3 mb-3">

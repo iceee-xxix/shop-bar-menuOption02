@@ -8,6 +8,7 @@ use App\Http\Controllers\admin\Expenses;
 use App\Http\Controllers\admin\Member;
 use App\Http\Controllers\admin\Memberorder;
 use App\Http\Controllers\admin\Menu;
+use App\Http\Controllers\admin\MenuTypeOption;
 use App\Http\Controllers\admin\Promotion;
 use App\Http\Controllers\admin\Table;
 use App\Http\Controllers\admin\Rider;
@@ -146,14 +147,22 @@ Route::middleware(['role:admin'])->group(function () {
     Route::get('/admin/menu/edit/{id}', [Menu::class, 'menuEdit'])->name('menuEdit');
     Route::post('/admin/menu/delete', [Menu::class, 'menuDelete'])->name('menuDelete');
     Route::post('/admin/menu/save', [Menu::class, 'menuSave'])->name('menuSave');
-    //กำหนดราคาอาหาร
-    Route::get('/admin/menuOption/{id}', [Menu::class, 'menuOption'])->name('menuOption');
-    Route::post('/admin/menu/menulistOption', [Menu::class, 'menulistOption'])->name('menulistOption');
-    Route::get('/admin/menu/menulistOptionCreate/{id}', [Menu::class, 'menulistOptionCreate'])->name('menulistOptionCreate');
-    Route::post('/admin/menu/menuOptionSave', [Menu::class, 'menuOptionSave'])->name('menuOptionSave');
-    Route::post('/admin/menu/menuOptionUpdate', [Menu::class, 'menuOptionUpdate'])->name('menuOptionUpdate');
-    Route::get('/admin/menu/menuOptionEdit/{id}', [Menu::class, 'menuOptionEdit'])->name('menuOptionEdit');
-    Route::post('/admin/menu/menuOptionEdit/delete', [Menu::class, 'menuOptionDelete'])->name('menuOptionDelete');
+    //เพิ่มตัวเลือก
+    Route::get('/admin/menu/menuTypeOption/{id}', [MenuTypeOption::class, 'menuTypeOption'])->name('menuTypeOption');
+    Route::post('/admin/menu/menuTypeOption/menuTypeOptionlistData', [MenuTypeOption::class, 'menuTypeOptionlistData'])->name('menuTypeOptionlistData');
+    Route::get('/admin/menu/menuTypeOption/create/{id}', [MenuTypeOption::class, 'MenuTypeOptionCreate'])->name('MenuTypeOptionCreate');
+    Route::post('/admin/menu/menuTypeOption/save', [MenuTypeOption::class, 'menuTypeOptionSave'])->name('menuTypeOptionSave');
+    Route::get('/admin/menu/menuTypeOption/edit/{id}', [MenuTypeOption::class, 'menuTypeOptionEdit'])->name('menuTypeOptionEdit');
+    Route::post('/admin/menu/menuTypeOption/update', [MenuTypeOption::class, 'menuTypeOptionUpdate'])->name('menuTypeOptionUpdate');
+    Route::post('/admin/menu/menuTypeOption/delete', [MenuTypeOption::class, 'menuTypeOptionDelete'])->name('menuTypeOptionDelete');
+    //กำหนดราคาในตัวเลือก
+    Route::get('/admin/menu/menuTypeOption/option/{id}', [Menu::class, 'menuOption'])->name('menuOption');
+    Route::post('/admin/menu/menuTypeOption/option/menulistOption', [Menu::class, 'menulistOption'])->name('menulistOption');
+    Route::get('/admin/menu/menuTypeOption/option/create/{id}', [Menu::class, 'menulistOptionCreate'])->name('menulistOptionCreate');
+    Route::get('/admin/menu/menuTypeOption/option/edit/{id}', [Menu::class, 'menuOptionEdit'])->name('menuOptionEdit');
+    Route::post('/admin/menu/menuTypeOption/option/save', [Menu::class, 'menuOptionSave'])->name('menuOptionSave');
+    Route::post('/admin/menu/menuTypeOption/option/update', [Menu::class, 'menuOptionUpdate'])->name('menuOptionUpdate');
+    Route::post('/admin/menu/menuTypeOption/option/delete', [Menu::class, 'menuOptionDelete'])->name('menuOptionDelete');
     //สต็อกสินค้า
     Route::get('/admin/stock', [Stock::class, 'stock'])->name('stock');
     Route::post('/admin/stock/stocklistData', [Stock::class, 'stocklistData'])->name('stocklistData');

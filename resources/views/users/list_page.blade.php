@@ -3,221 +3,249 @@
 @section('title', 'หน้ารายละเอียด')
 
 @section('content')
-<?php
+    <?php
+    
+    use App\Models\Config;
+    
+    $config = Config::first();
+    ?>
+    <style>
+        .title-buy {
+            font-size: 30px;
+            font-weight: bold;
+            color: <?=$config->color_font !='' ? $config->color_font : '#ffffff' ?>;
+        }
 
-use App\Models\Config;
+        .title-list-buy {
+            font-size: 25px;
+            font-weight: bold;
+        }
 
-$config = Config::first();
-?>
-<style>
-    .title-buy {
-        font-size: 30px;
-        font-weight: bold;
-        color: <?= $config->color_font != '' ? $config->color_font : '#ffffff' ?>;
-    }
+        .btn-plus {
+            background: none;
+            border: none;
+            color: rgb(0, 156, 0);
+            cursor: pointer;
+            padding: 0;
+            font-size: 12px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
 
-    .title-list-buy {
-        font-size: 25px;
-        font-weight: bold;
-    }
+        .btn-plus:hover {
+            color: rgb(185, 185, 185);
+        }
 
-    .btn-plus {
-        background: none;
-        border: none;
-        color: rgb(0, 156, 0);
-        cursor: pointer;
-        padding: 0;
-        font-size: 12px;
-        text-decoration: none;
-        font-weight: bold;
-        transition: all 0.3s ease;
-    }
+        .btn-delete {
+            background: none;
+            border: none;
+            color: rgb(192, 0, 0);
+            cursor: pointer;
+            padding: 0;
+            font-size: 12px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
 
-    .btn-plus:hover {
-        color: rgb(185, 185, 185);
-    }
+        .btn-delete:hover {
+            color: rgb(185, 185, 185);
+        }
 
-    .btn-delete {
-        background: none;
-        border: none;
-        color: rgb(192, 0, 0);
-        cursor: pointer;
-        padding: 0;
-        font-size: 12px;
-        text-decoration: none;
-        font-weight: bold;
-        transition: all 0.3s ease;
-    }
+        .btn-aprove {
+            background: linear-gradient(360deg, var(--primary-color), var(--sub-color));
+            border-radius: 20px;
+            border: 0px solid #0d9700;
+            padding: 5px 0px;
+            font-weight: bold;
+            text-decoration: none;
+            color: rgb(255, 255, 255);
+            transition: background 0.3s ease;
+        }
 
-    .btn-delete:hover {
-        color: rgb(185, 185, 185);
-    }
+        .btn-aprove:hover {
+            background: linear-gradient(360deg, var(--sub-color), var(--primary-color));
+            cursor: pointer;
+        }
 
-    .btn-aprove {
-        background: linear-gradient(360deg, var(--primary-color), var(--sub-color));
-        border-radius: 20px;
-        border: 0px solid #0d9700;
-        padding: 5px 0px;
-        font-weight: bold;
-        text-decoration: none;
-        color: rgb(255, 255, 255);
-        transition: background 0.3s ease;
-    }
+        .btn-edit {
+            background: transparent;
+            /* ไม่มีพื้นหลัง */
+            color: rgb(206, 0, 0);
+            /* ตัวหนังสือสีแดง */
+            border: none;
+            /* ไม่มีเส้นขอบ */
+            font-size: 12px;
+            /* ขนาดตัวอักษร */
+            text-decoration: underline;
+            /* มีเส้นใต้ */
+            padding: 0;
+            /* เอา padding ออกเพื่อไม่ให้เกินขอบ */
+            margin-top: -8px;
+            cursor: pointer;
+            /* เปลี่ยนเมาส์เป็น pointer */
+        }
+    </style>
 
-    .btn-aprove:hover {
-        background: linear-gradient(360deg, var(--sub-color), var(--primary-color));
-        cursor: pointer;
-    }
-</style>
-
-<div class="container">
-    <div class="d-flex flex-column justify-content-center gap-2">
-        <div class="title-buy">
-            คำสั่งซื้อ
-        </div>
-        <div class="bg-white px-2 pt-3 shadow-lg d-flex flex-column aling-items-center justify-content-center"
-            style="border-radius: 10px;">
-            <div class="title-list-buy">
-                รายการอาหารที่สั่ง
+    <div class="container">
+        <div class="d-flex flex-column justify-content-center gap-2">
+            <div class="title-buy">
+                คำสั่งซื้อ
             </div>
-            <div id="order-summary" class="mt-2"></div>
-            <div class="fw-bold fs-5 mt-5 " style="border-top:2px solid #7e7e7e; margin-bottom:-10px;">
-                ยอดชำระ
+            <div class="bg-white px-2 pt-3 shadow-lg d-flex flex-column aling-items-center justify-content-center"
+                style="border-radius: 10px;">
+                <div class="title-list-buy">
+                    รายการอาหารที่สั่ง
+                </div>
+                <div id="order-summary" class="mt-2"></div>
+                <div class="fw-bold fs-5 mt-5 " style="border-top:2px solid #7e7e7e; margin-bottom:-10px;">
+                    ยอดชำระ
+                </div>
+                <div class="fw-bold text-center" style="font-size:45px; ">
+                    <span id="total-price" style="color: #0d9700"></span><span class="text-dark ms-2">บาท</span>
+                </div>
             </div>
-            <div class="fw-bold text-center" style="font-size:45px; ">
-                <span id="total-price" style="color: #0d9700"></span><span class="text-dark ms-2">บาท</span>
-            </div>
+
+            <a href="javascript:void(0);" class="btn-aprove mt-3" id="confirm-order-btn"
+                style="display: none;">ยืนยันคำสั่งซื้อ</a>
         </div>
-        <div class="bg-white p-2 shadow-lg mt-3" style="border-radius:20px;">
-            <textarea class="form-control fw-bold text-center bg-white p-2" style="border-radius: 20px;" rows="4"
-                id="remark" placeholder="หมายเหตุ(ความต้องการเพิ่มเติม)">
-</textarea>
-        </div>
-        <a href="javascript:void(0);" class="btn-aprove mt-3" id="confirm-order-btn"
-            style="display: none;">ยืนยันคำสั่งซื้อ</a>
     </div>
-</div>
-<script src="{{ asset('assets/vendor/libs/jquery/jquery.js') }}"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        let orderData = JSON.parse(localStorage.getItem('orderData')) || {};
-        const container = document.getElementById('order-summary');
-        const totalPriceEl = document.getElementById('total-price');
 
-        function renderOrderList() {
-            container.innerHTML = '';
-            let total = 0;
+    <script src="{{ asset('assets/vendor/libs/jquery/jquery.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const container = document.getElementById('order-summary');
+            const totalPriceEl = document.getElementById('total-price');
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            console.log(cart)
 
-            if (Object.keys(orderData).length === 0) {
-                const noItemsMessage = document.createElement('div');
-                noItemsMessage.textContent = "ท่านยังไม่ได้เลือกสินค้า";
-                container.appendChild(noItemsMessage);
-            } else {
-                for (const name in orderData) {
-                    for (const type in orderData[name]) {
-                        const item = orderData[name][type];
-                        if (item.qty > 0) {
-                            const el = document.createElement('div');
-                            el.classList.add('d-flex', 'justify-content-between', 'align-items-center', 'mb-1');
+            function renderOrderList() {
 
-                            const itemText = document.createElement('div');
-                            itemText.textContent = `${name} (${type}) x${item.qty}`;
+                container.innerHTML = '';
+                let total = 0;
+                if (cart.length === 0) {
+                    const noItemsMessage = document.createElement('div');
+                    noItemsMessage.textContent = "ท่านยังไม่ได้เลือกสินค้า";
+                    container.appendChild(noItemsMessage);
+                } else {
+                    const mergedItems = {};
+                    cart.forEach(item => {
+                        if (!mergedItems[item.name]) {
+                            mergedItems[item.name] = [];
+                        }
+                        mergedItems[item.name].push(item);
+                    });
 
-                            const rightSide = document.createElement('div');
-                            rightSide.classList.add('d-flex', 'align-items-center', 'gap-2');
+                    for (const name in mergedItems) {
+                        const groupedItems = mergedItems[name];
+                        let totalPrice = 0;
+
+                        groupedItems.forEach(item => {
+                            totalPrice += item.total_price;
+
+                            const optionsText = (item.options && item.options.length) ?
+                                item.options.map(opt => opt.label).join(', ') :
+                                '-';
+
+                            const row = document.createElement('div');
+                            row.className =
+                                'row justify-content-between align-items-start fs-6 mb-2 text-start px-1';
+
+                            const leftCol = document.createElement('div');
+                            leftCol.className = 'col-9 d-flex flex-column justify-content-start lh-sm';
+
+                            const title = document.createElement('div');
+                            title.className = 'card-title m-0';
+                            title.textContent = item.name + " x" + item.amount;
+
+                            const optionTextEl = document.createElement('div');
+                            optionTextEl.className = 'text-muted';
+                            optionTextEl.style.fontSize = '12px';
+                            optionTextEl.textContent = optionsText;
+
+                            leftCol.appendChild(title);
+                            leftCol.appendChild(optionTextEl);
+
+                            const rightCol = document.createElement('div');
+                            rightCol.className = 'col-2 d-flex flex-column align-items-end';
 
                             const priceText = document.createElement('div');
-                            priceText.textContent = `${item.qty * item.price}`;
+                            priceText.textContent = item.total_price.toLocaleString();
 
-                            const deleteBtn = document.createElement('button');
-                            deleteBtn.classList.add('btn-delete');
-                            deleteBtn.textContent = 'ลบ';
-                            deleteBtn.onclick = () => {
-                                item.qty -= 1;
+                            const editBtn = document.createElement('a');
+                            editBtn.className = 'btn-edit';
+                            editBtn.textContent = 'แก้ไข';
+                            editBtn.href = `/detail/${item.category_id}#select-${item.id}&uuid=${item.uuid}`;
 
-                                if (item.qty <= 0) {
-                                    delete orderData[name][type];
-                                    if (Object.keys(orderData[name]).length === 0) {
-                                        delete orderData[name];
-                                    }
-                                }
+                            rightCol.appendChild(priceText);
+                            rightCol.appendChild(editBtn);
 
-                                localStorage.setItem('orderData', JSON.stringify(orderData));
-                                renderOrderList();
-                            };
+                            row.appendChild(leftCol);
+                            row.appendChild(rightCol);
+                            container.appendChild(row);
+                        });
 
-                            const plusBtn = document.createElement('button');
-                            plusBtn.classList.add('btn-plus');
-                            plusBtn.textContent = 'เพิ่ม';
-                            plusBtn.onclick = () => {
-                                item.qty += 1;
-                                localStorage.setItem('orderData', JSON.stringify(orderData));
-                                renderOrderList();
-                            };
 
-                            rightSide.appendChild(priceText);
-                            rightSide.appendChild(plusBtn);
-                            rightSide.appendChild(deleteBtn);
-
-                            el.appendChild(itemText);
-                            el.appendChild(rightSide);
-                            container.appendChild(el);
-
-                            total += item.qty * item.price;
-                        }
+                        total += totalPrice;
                     }
+                }
+
+                totalPriceEl.textContent = total.toLocaleString();
+            }
+
+            renderOrderList();
+
+            const confirmButton = document.getElementById('confirm-order-btn');
+
+            function toggleConfirmButton(cart) {
+                if (Object.keys(cart).length > 0) {
+                    confirmButton.style.display = 'inline-block';
+                } else {
+                    confirmButton.style.display = 'none';
                 }
             }
 
-            totalPriceEl.textContent = `${total}`;
-        }
 
-        renderOrderList();
-    });
-</script>
+            toggleConfirmButton(cart);
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const orderData = JSON.parse(localStorage.getItem('orderData')) || {};
-
-        const confirmButton = document.getElementById('confirm-order-btn');
-
-        if (Object.keys(orderData).length > 0) {
-            confirmButton.style.display = 'inline-block';
-        }
-
-        confirmButton.addEventListener('click', function(event) {
-            event.preventDefault();
-            Swal.showLoading();
-            if (Object.keys(orderData).length > 0) {
-                $.ajax({
-                    type: "post",
-                    url: "{{ route('SendOrder') }}",
-                    data: {
-                        orderData: orderData,
-                        remark: $('#remark').val()
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    dataType: "json",
-                    success: function(response) {
-                        Swal.close();
-                        if (response.status == true) {
-                            Swal.fire(response.message, "", "success");
-                            localStorage.removeItem('orderData');
-                            setTimeout(() => {
-                                location.reload();
-                            }, 3000);
-                        } else {
-                            Swal.fire(response.message, "", "error");
+            confirmButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                if (Object.keys(cart).length > 0) {
+                    $.ajax({
+                        type: "post",
+                        url: "{{ route('SendOrder') }}",
+                        data: {
+                            cart: cart,
+                            remark: $('#remark').val()
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        dataType: "json",
+                        success: function(response) {
+                            if (response.status == true) {
+                                Swal.fire(response.message, "", "success");
+                                localStorage.removeItem('cart');
+                                cart = {}; // เคลียร์ตัวแปร cart ด้วย
+                                toggleConfirmButton(cart); // ซ่อนปุ่ม
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 3000);
+                            } else {
+                                Swal.fire(response.message, "", "error");
+                                toggleConfirmButton(cart);
+                            }
                         }
-                    }
-                });
-            }
+                    });
+                }
+            });
+
         });
-    });
-</script>
+    </script>
+
+
+
 
 @endsection
