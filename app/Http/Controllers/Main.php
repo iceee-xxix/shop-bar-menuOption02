@@ -102,7 +102,7 @@ class Main extends Controller
                 $item[$key]['option'] = [];
             }
             $total = $total + $order['total_price'];
-            $menu_id[] = $rs['id'];
+            $menu_id[] = $order['id'];
         }
         $menu_id = array_unique($menu_id);
         foreach ($menu_id as $rs) {
