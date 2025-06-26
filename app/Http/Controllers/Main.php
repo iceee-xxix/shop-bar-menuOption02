@@ -35,7 +35,20 @@ class Main extends Controller
     public function detail($id)
     {
         $item = [];
-        $menu = Menu::where('categories_id', $id)->with('files')->orderBy('created_at', 'asc')->get();
+        $now = date('H:i:s');
+        $menu = Menu::where('categories_id', $id)
+            ->where(function ($query) use ($now) {
+                $query->where(function ($q) use ($now) {
+                    $q->whereNull('start_time')
+                        ->orWhere('start_time', '<=', $now);
+                })->where(function ($q) use ($now) {
+                    $q->whereNull('end_time')
+                        ->orWhere('end_time', '>=', $now);
+                });
+            })
+            ->with('files')
+            ->orderBy('created_at', 'asc')
+            ->get();
         foreach ($menu as $key => $rs) {
             $item[$key] = [
                 'id' => $rs->id,

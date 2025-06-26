@@ -14,12 +14,15 @@ use App\Models\OrdersOption;
 use App\Models\Pay;
 use App\Models\PayGroup;
 use App\Models\RiderSend;
+use App\Models\Table;
 use App\Models\User;
 use BaconQrCode\Encoder\QrCode;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PromptPayQR\Builder;
+use function Laravel\Prompts\table;
+
 
 class Admin extends Controller
 {
@@ -96,9 +99,10 @@ class Admin extends Controller
                 }
                 $flag_order = '<button class="btn btn-sm btn-success">สั่งหน้าร้าน</button>';
                 $action = '<button data-id="' . $rs->table_id . '" type="button" class="btn btn-sm btn-outline-primary modalShow m-1">รายละเอียด</button>' . $pay;
+                $table = Table::find($rs->table_id);
                 $info[] = [
                     'flag_order' => $flag_order,
-                    'table_id' => $rs->table_id,
+                    'table_id' => $table->table_number,
                     'total' => $rs->total,
                     'remark' => $rs->remark,
                     'status' => $status,
@@ -341,9 +345,10 @@ class Admin extends Controller
                 $action = '<a href="' . route('printReceipt', $rs->id) . '" target="_blank" type="button" class="btn btn-sm btn-outline-primary m-1">ออกใบเสร็จฉบับย่อ</a>
                 <button data-id="' . $rs->id . '" type="button" class="btn btn-sm btn-outline-primary modalTax m-1">ออกใบกำกับภาษี</button>
                 <button data-id="' . $rs->id . '" type="button" class="btn btn-sm btn-outline-primary modalShowPay m-1">รายละเอียด</button>';
+                $table = Table::find($rs->table_id);
                 $info[] = [
                     'payment_number' => $rs->payment_number,
-                    'table_id' => $rs->table_id,
+                    'table_id' => $table->table_number,
                     'total' => $rs->total,
                     'created' => $this->DateThai($rs->created_at),
                     'action' => $action

@@ -67,6 +67,8 @@ class Menu extends Controller
             $menu->name = $input['name'];
             $menu->categories_id = $input['categories_id'];
             $menu->base_price = $input['base_price'];
+            $menu->start_time = $input['start_time'] ?? null;
+            $menu->end_time = $input['end_time'] ?? null;
             $menu->detail = $input['detail'];
             $menu->categories_member_id = $input['categories_member_id'] ?? null;
             if ($menu->save()) {
@@ -87,6 +89,8 @@ class Menu extends Controller
             $menu->name = $input['name'];
             $menu->categories_id = $input['categories_id'];
             $menu->base_price = $input['base_price'];
+            $menu->start_time = $input['start_time'] ?? null;
+            $menu->end_time = $input['end_time'] ?? null;
             $menu->detail = $input['detail'];
             $menu->categories_member_id = $input['categories_member_id'] ?? null;
             if ($menu->save()) {

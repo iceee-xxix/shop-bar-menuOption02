@@ -66,6 +66,15 @@
                                                 @endforeach
                                             </select>
                                         </div>
+                                        <div class="row g-3 mb-3">
+                                        <div class="col-md-6">
+                                            <label for="start_time" class="form-label">เวลาเริ่มต้น : </label>
+                                            <input type="time" class="form-control" id="start_time" name="start_time" value="{{ old('start_time', $info->start_time) }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="end_time" class="form-label">เวลาสิ้นสุด : </label>
+                                            <input type="time" class="form-control" id="end_time" name="end_time" value="{{ old('end_time', $info->end_time) }}">
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="card-footer d-flex justify-content-end">
